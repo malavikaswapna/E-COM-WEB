@@ -76,8 +76,8 @@ const BentoFooter = () => {
           </div>
         </div>
         
-        <div className="bento-copyright">
-          <p>✨ {currentYear} Spice & Tea Exchange. All rights reserved. ✨</p>
+        <div className="copyright-section">
+          <p className="copyright-text">✨ {currentYear} Spice & Tea Exchange. All rights reserved. ✨</p>
           <div className="bottom-links">
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>

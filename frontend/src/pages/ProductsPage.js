@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../redux/slices/productSlice';
 import ProductCard from '../components/products/ProductCard';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import './ProductsPage.css';
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
@@ -58,21 +60,24 @@ const ProductsPage = () => {
   };
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">Our Products</h1>
+    <div className="products-page-container">
+      {/* Header Banner */}
+      <div className="products-banner">
+        <h1>Our Magical Collection ✨</h1>
+        <p>Discover the finest teas, spices, and blends from around the world</p>
+      </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Filter Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Filters</h2>
+      <div className="products-content">
+        {/* Filters */}
+        <div className="filters-container">
+          <div className="filters-card">
+            <h2>Enchant Your Search ✨</h2>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Product Type</label>
+            <div className="filter-group">
+              <label>Product Type</label>
               <select 
                 value={type} 
                 onChange={(e) => setType(e.target.value)}
-                className="w-full p-2 border rounded"
               >
                 <option value="">All Types</option>
                 {uniqueTypes.map(type => (
@@ -81,12 +86,11 @@ const ProductsPage = () => {
               </select>
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Origin</label>
+            <div className="filter-group">
+              <label>Origin</label>
               <select 
                 value={origin} 
                 onChange={(e) => setOrigin(e.target.value)}
-                className="w-full p-2 border rounded"
               >
                 <option value="">All Origins</option>
                 {uniqueOrigins.map(origin => (
@@ -95,12 +99,11 @@ const ProductsPage = () => {
               </select>
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Flavor Profile</label>
+            <div className="filter-group">
+              <label>Flavor Profile</label>
               <select 
                 value={flavor} 
                 onChange={(e) => setFlavor(e.target.value)}
-                className="w-full p-2 border rounded"
               >
                 <option value="">All Flavors</option>
                 {uniqueFlavors.map(flavor => (
@@ -109,69 +112,94 @@ const ProductsPage = () => {
               </select>
             </div>
             
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Price Range</label>
-              <div className="flex space-x-2">
+            <div className="filter-group">
+              <label>Price Range</label>
+              <div className="price-inputs">
                 <input 
                   type="number" 
                   placeholder="Min" 
                   value={priceRange.min}
                   onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
-                  className="w-1/2 p-2 border rounded"
                 />
                 <input 
                   type="number" 
                   placeholder="Max" 
                   value={priceRange.max}
                   onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
-                  className="w-1/2 p-2 border rounded"
                 />
               </div>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="filter-buttons">
               <button 
                 onClick={handleFilter}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex-1"
+                className="apply-button"
               >
-                Apply Filters
+                ✨ Apply Filters
               </button>
               <button 
                 onClick={clearFilters}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+                className="clear-button"
               >
                 Clear
               </button>
             </div>
           </div>
+          
+          {/* Quick Categories */}
+          <div className="quick-categories">
+            <button className={type === 'tea' ? 'active' : ''} onClick={() => {setType('tea'); handleFilter();}}>
+              🍵 Teas
+            </button>
+            <button className={type === 'spice' ? 'active' : ''} onClick={() => {setType('spice'); handleFilter();}}>
+              🌶️ Spices
+            </button>
+            <button className={type === 'blend' ? 'active' : ''} onClick={() => {setType('blend'); handleFilter();}}>
+              🧪 Blends
+            </button>
+            <button className={flavor === 'Sweet' ? 'active' : ''} onClick={() => {setFlavor('Sweet'); handleFilter();}}>
+              🍯 Sweet
+            </button>
+            <button className={flavor === 'Spicy' ? 'active' : ''} onClick={() => {setFlavor('Spicy'); handleFilter();}}>
+              🔥 Spicy
+            </button>
+          </div>
         </div>
         
         {/* Product Grid */}
-        <div className="lg:col-span-3">
+        <div className="products-grid-container">
           {loading ? (
-            <div className="text-center py-10">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading products...</p>
+            <div className="loading-container">
+              <LoadingSpinner size="large" color="purple" />
             </div>
           ) : error ? (
-            <div className="bg-red-100 text-red-700 p-4 rounded">
-              Error: {error}
+            <div className="error-container">
+              <div className="error-message">
+                <p>Oops! Something went wrong.</p>
+                <p>{error}</p>
+              </div>
+              <button className="retry-button" onClick={() => dispatch(fetchProducts())}>
+                Try Again
+              </button>
             </div>
           ) : products && products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map(product => (
-                <ProductCard key={product._id} product={product} />
+            <div className="bento-products-grid">
+              {products.map((product, index) => (
+                <div key={product._id} className={`bento-product-item item-${index % 5 + 1}`}>
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           ) : (
-            <div className="bg-gray-100 p-8 rounded text-center">
-              <p className="text-gray-600">No products found matching your criteria</p>
-              <button 
-                onClick={clearFilters}
-                className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                Reset Filters
-              </button>
+            <div className="no-products">
+              <div className="empty-state">
+                <div className="empty-icon">🔍</div>
+                <h3>No Products Found</h3>
+                <p>We couldn't find any products matching your criteria</p>
+                <button onClick={clearFilters} className="reset-button">
+                  Reset Filters
+                </button>
+              </div>
             </div>
           )}
         </div>

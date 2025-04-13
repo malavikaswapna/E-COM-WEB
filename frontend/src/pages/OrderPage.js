@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'react-toastify';
+import './OrderPage.css';
 
 // Initialize Stripe - replace with your publishable key
 const stripePromise = loadStripe('pk_test_51RCTVd4UqftcztGBKSEhcSlAxpdNsdcQKhoYiyUSerteZREmXedeXiOQi0Imi2m6LXDoLbQPdNh3IR3VjkGCEpdY00uMNrEGC1');
@@ -68,10 +69,10 @@ const PaymentForm = ({ clientSecret, orderId, onSuccess }) => {
   };
   
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Card Details</label>
-        <div className="p-3 border rounded-md bg-white">
+    <form onSubmit={handleSubmit} className="payment-form">
+      <div className="form-group">
+        <label className="form-label">Card Details</label>
+        <div className="card-element-container">
           <CardElement
             options={{
               style: {
@@ -89,11 +90,11 @@ const PaymentForm = ({ clientSecret, orderId, onSuccess }) => {
             }}
           />
         </div>
-        <p className="text-sm text-gray-500 mt-1">Test card: 4242 4242 4242 4242, any future date, any CVC</p>
+        <p className="form-note">Test card: 4242 4242 4242 4242, any future date, any CVC</p>
       </div>
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="payment-error">
           {error}
         </div>
       )}
@@ -101,11 +102,7 @@ const PaymentForm = ({ clientSecret, orderId, onSuccess }) => {
       <button
         type="submit"
         disabled={!stripe || processing}
-        className={`w-full py-2 px-4 rounded-lg text-white ${
-          !stripe || processing
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-green-600 hover:bg-green-700'
-        }`}
+        className="payment-submit-button"
       >
         {processing ? 'Processing...' : 'Pay Now'}
       </button>
@@ -162,105 +159,141 @@ const handlePaymentSuccess = () => {
   dispatch(getOrderDetails(orderId));
 };
 
+// Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Not yet';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
 if (loading) {
-  return <div className="text-center py-10">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
-      <p className="mt-2 text-gray-600">Loading order details...</p>
-    </div>;
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-10 text-red-600">
-        <p className="text-2xl mb-2">Error</p>
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  if (!order) {
-    return (
-      <div className="text-center py-10">
-        <p className="text-2xl mb-2">Order Not Found</p>
-        <p className="text-gray-600">The order you're looking for may have been removed or doesn't exist.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-2">Order {order._id}</h1>
-      <p className="text-gray-600 mb-8">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-semibold">Shipping</h2>
-              <p className="mt-2 text-gray-600">
-                <strong>Name:</strong> {order.user?.name}
-              </p>
-              <p className="text-gray-600">
-                <strong>Email:</strong> {order.user?.email}
-              </p>
-              <p className="text-gray-600">
-                <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city},{' '}
-                {order.shippingAddress.postalCode}, {order.shippingAddress.country}
-              </p>
-              
-              {order.isDelivered ? (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-3">
-                  Delivered on {new Date(order.deliveredAt).toLocaleDateString()}
-                </div>
-              ) : (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mt-3">
-                  Not Delivered
-                </div>
-              )}
+    <div className="order-page-container">
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading order details...</p>
+      </div>
+    </div>
+  );
+}
+
+if (error) {
+  return (
+    <div className="order-page-container">
+      <div className="error-container">
+        <div className="error-icon">❌</div>
+        <h2>Error</h2>
+        <p>{error}</p>
+        <Link to="/profile" className="back-button">Back to Profile</Link>
+      </div>
+    </div>
+  );
+}
+
+if (!order) {
+  return (
+    <div className="order-page-container">
+      <div className="error-container">
+        <div className="error-icon">🔍</div>
+        <h2>Order Not Found</h2>
+        <p>The order you're looking for may have been removed or doesn't exist.</p>
+        <Link to="/profile" className="back-button">Back to Profile</Link>
+      </div>
+    </div>
+  );
+}
+
+return (
+  <div className="order-page-container">
+    <div className="order-header">
+      <h1>Order Details ✨</h1>
+      <p>Order #{order._id}</p>
+      <div className="order-date">Placed on {formatDate(order.createdAt)}</div>
+    </div>
+    
+    <div className="order-content">
+      <div className="order-grid">
+        <div className="order-details-column">
+          <div className="bento-card shipping-info-card">
+            <div className="card-header">
+              <h2>Shipping</h2>
             </div>
-            
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-semibold">Payment Method</h2>
-              <p className="mt-2 text-gray-600">
-                <strong>Method:</strong> {order.paymentMethod}
-              </p>
+            <div className="card-content">
+              <div className="info-section">
+                <p><strong>Name:</strong> {order.user?.name}</p>
+                <p><strong>Email:</strong> {order.user?.email}</p>
+                <p><strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city},{' '}
+                {order.shippingAddress.postalCode}, {order.shippingAddress.country}</p>
+              </div>
               
-              {order.isPaid ? (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-3">
-                  Paid on {new Date(order.paidAt).toLocaleDateString()}
-                </div>
-              ) : (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mt-3">
-                  Not Paid
-                </div>
-              )}
+              <div className="status-badge-container">
+                {order.isDelivered ? (
+                  <div className="status-badge delivered">
+                    Delivered on {formatDate(order.deliveredAt)}
+                  </div>
+                ) : (
+                  <div className="status-badge pending">
+                    Not Delivered
+                  </div>
+                )}
+              </div>
             </div>
-            
-            <div className="p-4">
-              <h2 className="text-xl font-semibold mb-4">Order Items</h2>
+          </div>
+          
+          <div className="bento-card payment-info-card">
+            <div className="card-header">
+              <h2>Payment</h2>
+            </div>
+            <div className="card-content">
+              <div className="info-section">
+                <p><strong>Method:</strong> {order.paymentMethod}</p>
+              </div>
               
-              <div className="space-y-4">
+              <div className="status-badge-container">
+                {order.isPaid ? (
+                  <div className="status-badge delivered">
+                    Paid on {formatDate(order.paidAt)}
+                  </div>
+                ) : (
+                  <div className="status-badge pending">
+                    Not Paid
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="bento-card order-items-card">
+            <div className="card-header">
+              <h2>Order Items</h2>
+            </div>
+            <div className="card-content">
+              <div className="order-items">
                 {order.orderItems.map((item, index) => (
-                  <div key={index} className="flex items-center py-2 border-b last:border-b-0">
-                    <div className="w-16 h-16 flex-shrink-0">
+                  <div key={index} className="order-item">
+                    <div className="item-image">
                       <img
                         src={item.image || '/images/placeholder-spice.jpg'}
                         alt={item.name}
-                        className="w-full h-full object-cover rounded"
                       />
                     </div>
                     
-                    <div className="ml-4 flex-grow">
-                      <Link
-                        to={`/products/${item.product}`}
-                        className="text-lg font-medium hover:text-green-600"
-                      >
+                    <div className="item-details">
+                      <Link to={`/products/${item.product}`} className="item-name">
                         {item.name}
                       </Link>
                     </div>
                     
-                    <div className="text-right">
-                      {item.qty} {item.unit} x ${item.price.toFixed(2)} = ${(item.qty * item.price).toFixed(2)}
+                    <div className="item-quantity">
+                      {item.qty} {item.unit} x ${item.price.toFixed(2)}
+                    </div>
+                    
+                    <div className="item-price">
+                      ${(item.qty * item.price).toFixed(2)}
                     </div>
                   </div>
                 ))}
@@ -269,62 +302,87 @@ if (loading) {
           </div>
         </div>
         
-        <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-            
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between">
-                <span>Items:</span>
+        <div className="order-summary-column">
+          <div className="bento-card order-summary-card">
+            <div className="card-header">
+              <h2>Order Summary</h2>
+            </div>
+            <div className="card-content">
+              <div className="summary-row">
+                <span>Items</span>
                 <span>${order.itemsPrice?.toFixed(2) || (order.totalPrice - order.shippingPrice - order.taxPrice).toFixed(2)}</span>
               </div>
               
-              <div className="flex justify-between">
-                <span>Shipping:</span>
+              <div className="summary-row">
+                <span>Shipping</span>
                 <span>${order.shippingPrice.toFixed(2)}</span>
               </div>
               
-              <div className="flex justify-between">
-                <span>Tax:</span>
+              <div className="summary-row">
+                <span>Tax</span>
                 <span>${order.taxPrice.toFixed(2)}</span>
               </div>
               
-              <div className="flex justify-between font-bold border-t pt-2">
-                <span>Total:</span>
+              <div className="summary-total">
+                <span>Total</span>
                 <span>${order.totalPrice.toFixed(2)}</span>
               </div>
+              
+              {/* Payment Section */}
+              {!order.isPaid && order.paymentMethod === 'Stripe' && clientSecret && !paymentSuccess && (
+                <div className="payment-section">
+                  <h3>Complete Payment</h3>
+                  <Elements stripe={stripePromise}>
+                    <PaymentForm 
+                      clientSecret={clientSecret} 
+                      orderId={order._id}
+                      onSuccess={handlePaymentSuccess} 
+                    />
+                  </Elements>
+                </div>
+              )}
+              
+              {paymentSuccess && (
+                <div className="payment-success">
+                  Payment successful! Thank you for your order.
+                </div>
+              )}
+              
+              {order.isPaid && (
+                <div className="payment-complete">
+                  Payment completed on {formatDate(order.paidAt)}
+                </div>
+              )}
             </div>
-            
-            {/* Payment Section */}
-            {!order.isPaid && order.paymentMethod === 'Stripe' && clientSecret && !paymentSuccess && (
-              <div className="mt-6 border-t pt-4">
-                <h3 className="text-lg font-semibold mb-3">Complete Payment</h3>
-                <Elements stripe={stripePromise}>
-                  <PaymentForm 
-                    clientSecret={clientSecret} 
-                    orderId={order._id}
-                    onSuccess={handlePaymentSuccess} 
-                  />
-                </Elements>
-              </div>
-            )}
-            
-            {paymentSuccess && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-6">
-                Payment successful! Thank you for your order.
-              </div>
-            )}
-            
-            {order.isPaid && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                Payment completed on {new Date(order.paidAt).toLocaleDateString()}
-              </div>
-            )}
+          </div>
+          
+          <div className="bento-card order-actions-card">
+            <div className="card-content">
+              <Link to="/profile" className="back-to-profile">
+                Back to Profile
+              </Link>
+              
+              <Link to="/products" className="continue-shopping">
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
+          
+          <div className="bento-card need-help-card">
+            <div className="card-header">
+              <h2>Need Help?</h2>
+            </div>
+            <div className="card-content">
+              <p>If you have questions about your order, our customer support team is ready to assist you!</p>
+              <p className="contact-detail">📧 support@spicetea.com</p>
+              <p className="contact-detail">📞 (555) 123-4567</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default OrderPage;

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser, clearError } from '../redux/slices/authSlice';
 import './LoginPage.css';
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -35,25 +37,28 @@ const LoginPage = () => {
         <div className="bento-grid">
           <div className="bento-item">
             <img 
-              src="https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+              src="https://img.freepik.com/free-photo/christmas-home-scene-illustration_23-2151894297.jpg?ga=GA1.1.345133788.1743087846&semt=ais_hybrid&w=740" 
               alt="Food" 
             />
           </div>
+
           <div className="bento-item">
             <img 
-              src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+              src="https://media.istockphoto.com/id/1336503106/photo/ground-moringa-and-moringa-tea-on-rustic-table.jpg?s=612x612&w=0&k=20&c=W_WNUkZOTpUhe0d4QNv_fU24kppgy-IxLdci-y3n-R4=" 
               alt="Tea" 
             />
           </div>
+
           <div className="bento-item">
             <img 
-              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+              src="https://i.pinimg.com/736x/ab/3e/b0/ab3eb016e4694959cbc1d1aa6ea20bf2.jpg" 
               alt="Cookies" 
             />
           </div>
+          
           <div className="bento-item">
             <img 
-              src="https://images.unsplash.com/photo-1542327897-d73f4005b533?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+              src="https://i.pinimg.com/736x/8b/b9/55/8bb955a7a1029d50459c3a553b08b29e.jpg" 
               alt="People" 
             />
           </div>
@@ -61,13 +66,8 @@ const LoginPage = () => {
         
         {/* Login Form */}
         <div className="login-form">
-          <div className="logo-container">
-            <div className="logo-circle">T&S</div>
-            <h1 className="title">International ✨</h1>
-            <p className="subtitle">Spice & Tea Exchange 🫖</p>
-          </div>
           
-          <h2 className="title">Welcome back! ✨</h2>
+          <h2 className="title">Welcome back! ☕️</h2>
           <p className="subtitle">Let's explore magical flavors together~</p>
           
           {error && (
@@ -102,7 +102,11 @@ const LoginPage = () => {
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? (
+                <EyeOffIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
               </button>
             </div>
             

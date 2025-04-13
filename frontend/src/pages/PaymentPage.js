@@ -6,70 +6,15 @@ import { savePaymentMethod } from '../redux/slices/cartSlice';
 import { Elements } from '@stripe/react-stripe-js';
 import stripePromise from '../config/stripeConfig';
 import { toast } from 'react-toastify';
-
-// Payment method selection component
-const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod, handleContinue }) => {
-  return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Select Payment Method</h2>
-      
-      <div className="mb-6">
-        <label className="block text-gray-700 mb-4 text-lg font-medium">
-          Available Methods
-        </label>
-        
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <input
-              id="stripe"
-              name="paymentMethod"
-              type="radio"
-              value="Stripe"
-              className="h-4 w-4 text-green-600 focus:ring-green-500"
-              checked={paymentMethod === 'Stripe'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            />
-            <label htmlFor="stripe" className="ml-3 block text-gray-700">
-              Credit Card (Stripe)
-            </label>
-          </div>
-          
-          <div className="flex items-center">
-            <input
-              id="paypal"
-              name="paymentMethod"
-              type="radio"
-              value="PayPal"
-              className="h-4 w-4 text-green-600 focus:ring-green-500"
-              checked={paymentMethod === 'PayPal'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            />
-            <label htmlFor="paypal" className="ml-3 block text-gray-700">
-              PayPal
-            </label>
-          </div>
-        </div>
-      </div>
-      
-      <button
-        type="button"
-        onClick={handleContinue}
-        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50"
-      >
-        Continue
-      </button>
-    </div>
-  );
-};
+import './PaymentPage.css';
 
 const PaymentPage = () => {
   const { shippingAddress } = useSelector((state) => state.cart);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [paymentMethod, setPaymentMethod] = useState('Stripe');
-  const [showMethodSelector, setShowMethodSelector] = useState(true);
-  
+
   // Redirect to shipping if no shipping address
   if (!shippingAddress.address) {
     navigate('/shipping');
@@ -84,44 +29,135 @@ const PaymentPage = () => {
       navigate('/placeorder');
     } else if (paymentMethod === 'PayPal') {
       // For PayPal, we'll just save the method and navigate
-      // (In a real app, you would integrate PayPal SDK here)
       dispatch(savePaymentMethod(paymentMethod));
       toast.success('Payment method selected: PayPal');
       navigate('/placeorder');
     }
   };
-  
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+    <div className="payment-page-container">
+      <div className="payment-header">
+        <h1>Payment Method ✨</h1>
+        <p>Choose how you'd like to pay for your order</p>
+      </div>
+      
+      <div className="checkout-steps">
+        <div className="step completed">
+          <div className="step-number">1</div>
+          <div className="step-label">Shipping</div>
+        </div>
+        <div className="step-connector completed"></div>
+        <div className="step active">
+          <div className="step-number">2</div>
+          <div className="step-label">Payment</div>
+        </div>
+        <div className="step-connector"></div>
+        <div className="step">
+          <div className="step-number">3</div>
+          <div className="step-label">Place Order</div>
+        </div>
+      </div>
+      
+      <div className="payment-content">
+        <div className="payment-grid">
+          <div className="bento-card payment-methods-card">
+            <div className="card-header">
+              <h2>Select Payment Method</h2>
+              <p>Choose your preferred payment option</p>
+            </div>
+            
+            <div className="payment-methods">
+              <div 
+                className={`payment-method-option ${paymentMethod === 'Stripe' ? 'selected' : ''}`}
+                onClick={() => setPaymentMethod('Stripe')}
+              >
+                <div className="payment-icon">💳</div>
+                <div className="payment-details">
+                  <h3>Credit Card</h3>
+                  <p>Pay securely with your credit card via Stripe</p>
+                </div>
+                <div className="payment-radio">
+                  <div className={`radio-circle ${paymentMethod === 'Stripe' ? 'checked' : ''}`}>
+                    {paymentMethod === 'Stripe' && <div className="radio-dot"></div>}
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className={`payment-method-option ${paymentMethod === 'PayPal' ? 'selected' : ''}`}
+                onClick={() => setPaymentMethod('PayPal')}
+              >
+                <div className="payment-icon">💵</div>
+                <div className="payment-details">
+                  <h3>PayPal</h3>
+                  <p>Pay using your PayPal account</p>
+                </div>
+                <div className="payment-radio">
+                  <div className={`radio-circle ${paymentMethod === 'PayPal' ? 'checked' : ''}`}>
+                    {paymentMethod === 'PayPal' && <div className="radio-dot"></div>}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="payment-actions">
+              <button
+                onClick={() => navigate('/shipping')}
+                className="back-button"
+              >
+                Back to Shipping
+              </button>
+              
+              <button
+                onClick={handleContinue}
+                className="continue-button"
+              >
+                Continue to Place Order
+              </button>
+            </div>
+          </div>
           
-          <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-            <div className="flex space-x-8">
-              <div className="flex items-center">
-                <div className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center mr-2">1</div>
-                <span>Shipping</span>
+          <div className="payment-sidebar">
+            <div className="bento-card shipping-summary-card">
+              <div className="card-header">
+                <h2>Shipping Address</h2>
               </div>
-              <div className="flex items-center">
-                <div className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center mr-2">2</div>
-                <span className="font-semibold">Payment</span>
+              <div className="shipping-summary">
+                <p className="summary-address">{shippingAddress.address}</p>
+                <p className="summary-city-state">
+                  {shippingAddress.city}, {shippingAddress.postalCode}
+                </p>
+                <p className="summary-country">{shippingAddress.country}</p>
+                <button 
+                  onClick={() => navigate('/shipping')}
+                  className="edit-button"
+                >
+                  Edit
+                </button>
               </div>
-              <div className="flex items-center">
-                <div className="bg-gray-300 text-gray-600 w-6 h-6 rounded-full flex items-center justify-center mr-2">3</div>
-                <span>Place Order</span>
+            </div>
+            
+            <div className="bento-card secure-payment-card">
+              <div className="secure-payment-content">
+                <div className="secure-icon">🔒</div>
+                <h3>Secure Payment</h3>
+                <p>Your payment information is encrypted and secure. We never store your full credit card details.</p>
+              </div>
+            </div>
+            
+            <div className="bento-card payment-help-card">
+              <div className="card-header">
+                <h2>Need Help?</h2>
+              </div>
+              <div className="help-content">
+                <p>If you're having trouble with payment, our customer support team is ready to assist you!</p>
+                <p className="contact-detail">📧 support@spicetea.com</p>
+                <p className="contact-detail">📞 (555) 123-4567</p>
               </div>
             </div>
           </div>
         </div>
-        
-        {showMethodSelector && (
-          <PaymentMethodSelector 
-            paymentMethod={paymentMethod} 
-            setPaymentMethod={setPaymentMethod} 
-            handleContinue={handleContinue}
-          />
-        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { listMyOrders } from '../redux/slices/orderSlice';
+import './MyOrdersPage.css';
 
 const MyOrdersPage = () => {
   const dispatch = useDispatch();
@@ -13,101 +14,95 @@ const MyOrdersPage = () => {
     dispatch(listMyOrders());
   }, [dispatch]);
   
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Not available';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+  
+  // Get shortened order ID
+  const getShortOrderId = (orderId) => {
+    return orderId.substring(0, 8);
+  };
+  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">My Orders</h1>
+    <div className="my-orders-container">
+      <div className="my-orders-header">
+        <h1>Order History</h1>
+        <p>View your past orders</p>
+      </div>
       
-      {loading ? (
-        <div className="text-center py-10">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-10 text-red-600">
-          Error: {error}
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="mb-4">You haven't placed any orders yet.</p>
-          <Link
-            to="/products"
-            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
-          >
-            Browse Products
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Paid
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Delivered
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {orders.map((order) => (
-                  <tr key={order._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order._id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      ${order.totalPrice.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {order.isPaid ? (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {new Date(order.paidAt).toLocaleDateString()}
-                        </span>
-                      ) : (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                          Not Paid
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {order.isDelivered ? (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {new Date(order.deliveredAt).toLocaleDateString()}
-                        </span>
-                      ) : (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          Pending
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <Link
-                        to={`/order/${order._id}`}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="my-orders-content">
+        {loading ? (
+          <div className="loading-container">
+            <div className="spinner"></div>
+            <p>Loading your orders...</p>
           </div>
-        </div>
-      )}
+        ) : error ? (
+          <div className="error-container">
+            <p>Error: {error}</p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="empty-orders">
+            <p>You haven't placed any orders yet.</p>
+            <Link to="/products" className="shop-button">
+              Browse Products
+            </Link>
+          </div>
+        ) : (
+          <div className="orders-list">
+            {orders.map((order) => (
+              <div key={order._id} className="order-card">
+                <div className="order-header">
+                  <div className="order-id-date">
+                    <h3 className="order-id">Order #{getShortOrderId(order._id)}</h3>
+                    <p className="order-date">{formatDate(order.createdAt)}</p>
+                  </div>
+                  <div className="order-status">
+                    {order.isPaid ? (
+                      order.isDelivered ? (
+                        <span className="status delivered">Delivered</span>
+                      ) : (
+                        <span className="status processing">Processing</span>
+                      )
+                    ) : (
+                      <span className="status pending">Pending</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="order-items">
+                  {order.orderItems.map((item) => (
+                    <div key={item._id || item.product} className="order-item">
+                      <div className="item-name">{item.name}</div>
+                      <div className="item-quantity">{item.qty} × ${item.price.toFixed(2)}</div>
+                    </div>
+                  ))}
+                  {order.orderItems.length > 3 && (
+                    <div className="more-items">
+                      + {order.orderItems.length - 3} more items
+                    </div>
+                  )}
+                </div>
+                
+                <div className="order-footer">
+                  <div className="order-total">
+                    Total: ${order.totalPrice.toFixed(2)}
+                  </div>
+                  <Link to={`/order/${order._id}`} className="view-details-button">
+                    View Details
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

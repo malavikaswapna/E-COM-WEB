@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { removeFromCart, updateCartItemQuantity, getCartTotals } from '../redux/slices/cartSlice';
+import './CartPage.css';
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -30,144 +31,158 @@ const CartPage = () => {
   };
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
+    <div className="cart-page-container">
+      <div className="cart-header">
+        <h1>Your Magical Cart ✨</h1>
+        <p>Review your items before checkout</p>
+      </div>
       
-      {cartItems.length === 0 ? (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="mb-4">Your cart is empty</p>
-          <Link
-            to="/products"
-            className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200"
-          >
-            Browse Products
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              {cartItems.map((item) => (
-                <div
-                  key={item.product}
-                  className="border-b last:border-b-0 p-4 flex items-center"
-                >
-                  <div className="w-20 h-20 flex-shrink-0">
-                    <img
-                      src={item.image || '/images/placeholder-spice.jpg'}
-                      alt={item.name}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                  
-                  <div className="ml-4 flex-grow">
-                    <Link
-                      to={`/products/${item.product}`}
-                      className="text-lg font-medium hover:text-green-600 transition-colors duration-200"
-                    >
-                      {item.name}
-                    </Link>
-                    
-                    <div className="text-gray-600 text-sm">
-                      ${item.price.toFixed(2)} / {item.unit}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <select
-                      value={item.qty}
-                      onChange={(e) =>
-                        updateQuantityHandler(
-                          item.product,
-                          Number(e.target.value)
-                        )
-                      }
-                      className="border rounded mr-4 p-1"
-                    >
-                      {[...Array(Math.min(10, item.stock)).keys()].map((x) => (
-                        <option key={x + 1} value={x + 1}>
-                          {x + 1}
-                        </option>
-                      ))}
-                    </select>
-                    
-                    <button
-                      type="button"
-                      onClick={() => removeFromCartHandler(item.product)}
-                      className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                      aria-label="Remove item"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      <div className="cart-content">
+        {cartItems.length === 0 ? (
+          <div className="empty-cart">
+            <div className="empty-cart-icon">🛒</div>
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added any products to your cart yet.</p>
+            <Link to="/products" className="continue-shopping-button">
+              Explore Products
+            </Link>
+          </div>
+        ) : (
+          <div className="cart-grid">
+            <div className="cart-items-container">
+              <div className="bento-card">
+                <div className="card-header">
+                  <h2>Shopping Cart ({cartItems.reduce((acc, item) => acc + item.qty, 0)} items)</h2>
+                </div>
+                
+                <div className="cart-items">
+                  {cartItems.map((item) => (
+                    <div key={item.product} className="cart-item">
+                      <div className="item-image">
+                        <img
+                          src={item.image || '/images/placeholder-spice.jpg'}
+                          alt={item.name}
                         />
-                      </svg>
-                    </button>
+                      </div>
+                      
+                      <div className="item-details">
+                        <Link to={`/products/${item.product}`} className="item-name">
+                          {item.name}
+                        </Link>
+                        <p className="item-price">${item.price.toFixed(2)} / {item.unit}</p>
+                        
+                        <div className="item-actions">
+                          <div className="quantity-selector">
+                            <button
+                              onClick={() => updateQuantityHandler(item.product, Math.max(1, item.qty - 1))}
+                              className="quantity-button"
+                              aria-label="Decrease quantity"
+                            >
+                              -
+                            </button>
+                            
+                            <span className="quantity-value">{item.qty}</span>
+                            
+                            <button
+                              onClick={() => updateQuantityHandler(item.product, Math.min(item.stock, item.qty + 1))}
+                              className="quantity-button"
+                              aria-label="Increase quantity"
+                              disabled={item.qty >= item.stock}
+                            >
+                              +
+                            </button>
+                          </div>
+                          
+                          <button
+                            onClick={() => removeFromCartHandler(item.product)}
+                            className="remove-button"
+                            aria-label="Remove item"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="item-total">
+                        ${(item.price * item.qty).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="cart-footer">
+                  <Link to="/products" className="continue-link">
+                    <span>←</span> Continue Shopping
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            <div className="cart-summary-container">
+              <div className="bento-card">
+                <div className="card-header">
+                  <h2>Order Summary</h2>
+                </div>
+                
+                <div className="summary-content">
+                  <div className="summary-row">
+                    <span>Subtotal</span>
+                    <span>${itemsPrice?.toFixed(2) || '0.00'}</span>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-              
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between">
-                  <span>Items ({cartItems.reduce((acc, item) => acc + item.qty, 0)}):</span>
-                  <span>${itemsPrice?.toFixed(2) || '0.00'}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span>Shipping:</span>
-                  <span>${shippingPrice?.toFixed(2) || '0.00'}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span>Tax:</span>
-                  <span>${taxPrice?.toFixed(2) || '0.00'}</span>
-                </div>
-                
-                <div className="flex justify-between font-bold border-t pt-2">
-                  <span>Total:</span>
-                  <span>${totalPrice || '0.00'}</span>
+                  
+                  <div className="summary-row">
+                    <span>Shipping</span>
+                    {shippingPrice === 0 ? (
+                      <span className="free-shipping">FREE</span>
+                    ) : (
+                      <span>${shippingPrice?.toFixed(2) || '0.00'}</span>
+                    )}
+                  </div>
+                  
+                  <div className="summary-row">
+                    <span>Tax</span>
+                    <span>${taxPrice?.toFixed(2) || '0.00'}</span>
+                  </div>
+                  
+                  <div className="summary-total">
+                    <span>Total</span>
+                    <span>${totalPrice || '0.00'}</span>
+                  </div>
+                  
+                  <button
+                    onClick={checkoutHandler}
+                    className="checkout-button"
+                    disabled={cartItems.length === 0}
+                  >
+                    Proceed to Checkout
+                  </button>
+                  
+                  {shippingPrice > 0 && (
+                    <div className="shipping-note">
+                      Add ${(100 - itemsPrice).toFixed(2)} more to qualify for FREE shipping
+                    </div>
+                  )}
+                  
+                  {shippingPrice === 0 && (
+                    <div className="shipping-success">
+                      ✓ Your order qualifies for FREE shipping!
+                    </div>
+                  )}
                 </div>
               </div>
               
-              <button
-                type="button"
-                onClick={checkoutHandler}
-                disabled={cartItems.length === 0}
-                className={`w-full py-2 px-4 rounded-lg text-white ${
-                  cartItems.length === 0
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700 transition-colors duration-200'
-                }`}
-              >
-                Proceed to Checkout
-              </button>
-              
-              <div className="mt-4 text-center text-sm text-gray-500">
-                {cartItems.length > 0 && shippingPrice === 0 && (
-                  <p className="text-green-600">Your order qualifies for free shipping!</p>
-                )}
-                {cartItems.length > 0 && shippingPrice > 0 && (
-                  <p>Add ${(100 - itemsPrice).toFixed(2)} more to qualify for free shipping</p>
-                )}
+              <div className="bento-card payment-methods">
+                <div className="payment-icons">
+                  <span className="payment-icon">💳</span>
+                  <span className="payment-icon">💵</span>
+                  <span className="payment-icon">💰</span>
+                </div>
+                <p>We accept credit cards, PayPal, and more</p>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

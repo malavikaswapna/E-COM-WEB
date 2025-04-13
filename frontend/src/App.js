@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import NotFound from './pages/NotFound';
 
 import BentoHeader from './components/layout/BentoHeader';
 import BentoFooter from './components/layout/BentoFooter';
@@ -74,13 +75,7 @@ function App() {
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
 
           {/* Catch-all route - 404 */}
-          <Route path="*" element={
-            <div className="text-center py-10">
-              <h2 className="text-2xl font-bold mb-4">404 - Page Not Found</h2>
-              <p className="mb-4">The page you are looking for does not exist.</p>
-              <a href="/" className="text-green-600 hover:underline">Go back to home</a>
-            </div>
-          } />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <BentoFooter />

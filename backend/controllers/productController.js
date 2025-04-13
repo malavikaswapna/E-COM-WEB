@@ -123,3 +123,31 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+// Search Bar
+exports.searchProducts = async (req, res) => {
+  try {
+    const keyword = req.query.keyword 
+      ? { 
+          $or: [
+            { name: { $regex: req.query.keyword, $options: 'i' } },
+            { description: { $regex: req.query.keyword, $options: 'i' } },
+            { 'origin.country': { $regex: req.query.keyword, $options: 'i' } }
+          ] 
+        } 
+      : {};
+      
+    const products = await Product.find({ ...keyword });
+    
+    res.json({
+      status: 'success',
+      results: products.length,
+      data: products
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+};
