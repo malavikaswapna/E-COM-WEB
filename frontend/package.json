@@ -17,6 +17,7 @@
     "lucide-react": "^0.487.0",
     "mapbox-gl": "^3.11.0",
     "mongoose": "^8.13.2",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.2.0",

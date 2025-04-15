@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import './ProductCreatePage.css';
 
 const ProductCreatePage = () => {
   const navigate = useNavigate();
@@ -202,385 +204,386 @@ const ProductCreatePage = () => {
   };
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Add New Product</h1>
-        
-        <button
-          onClick={() => navigate('/admin/products')}
-          className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
-        >
-          Back to Products
-        </button>
+    <div className="product-create-container">
+      {/* Header Banner */}
+      <div className="product-create-banner">
+        <h1>Create Magical Product ✨</h1>
+        <p>Add a new item to your enchanted collection</p>
       </div>
       
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-        {/* Basic Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Basic Information</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 mb-2">Product Name <span className="text-red-500">*</span></label>
-              <input
-                type="text"
-                name="name"
-                value={productData.name}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Product Type <span className="text-red-500">*</span></label>
-              <select
-                name="type"
-                value={productData.type}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              >
-                <option value="spice">Spice</option>
-                <option value="tea">Tea</option>
-                <option value="blend">Blend</option>
-              </select>
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className="block text-gray-700 mb-2">Description <span className="text-red-500">*</span></label>
-              <textarea
-                name="description"
-                value={productData.description}
-                onChange={handleChange}
-                rows="4"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              ></textarea>
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Price <span className="text-red-500">*</span></label>
-              <input
-                type="number"
-                name="price"
-                value={productData.price}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Unit <span className="text-red-500">*</span></label>
-              <select
-                name="unit"
-                value={productData.unit}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              >
-                <option value="g">Grams (g)</option>
-                <option value="kg">Kilograms (kg)</option>
-                <option value="oz">Ounces (oz)</option>
-                <option value="lb">Pounds (lb)</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Stock <span className="text-red-500">*</span></label>
-              <input
-                type="number"
-                name="stock"
-                value={productData.stock}
-                onChange={handleChange}
-                min="0"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Status</label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={productData.isActive}
-                    onChange={(e) => setProductData({...productData, isActive: e.target.checked})}
-                    className="form-checkbox h-5 w-5 text-green-600"
-                  />
-                  <span className="ml-2">Active</span>
-                </label>
-                
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    name="featured"
-                    checked={productData.featured}
-                    onChange={(e) => setProductData({...productData, featured: e.target.checked})}
-                    className="form-checkbox h-5 w-5 text-green-600"
-                  />
-                  <span className="ml-2">Featured</span>
-                </label>
-              </div>
-            </div>
-          </div>
+      <div className="product-create-content">
+        <div className="action-header">
+          <button
+            onClick={() => navigate('/admin/products')}
+            className="back-button"
+          >
+            &larr; Back to Products
+          </button>
         </div>
         
-        {/* Images */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Product Images</h2>
-          
-          <div className="space-y-2">
-            {productData.images.map((image, index) => (
-              <div key={index} className="flex items-center space-x-2">
+        <form onSubmit={handleSubmit} className="create-form">
+          {/* Basic Information */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Basic Information</h2>
+              <p>Essential details about your product</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Product Name <span className="required">*</span></label>
                 <input
                   type="text"
-                  value={image}
-                  onChange={(e) => handleArrayChange(e, index, 'images')}
-                  placeholder="Image URL"
-                  className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeArrayItem(index, 'images')}
-                  className="bg-red-100 text-red-600 p-2 rounded hover:bg-red-200"
-                  disabled={productData.images.length <= 1}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-            
-            <button
-              type="button"
-              onClick={() => addArrayItem('images')}
-              className="bg-blue-100 text-blue-600 px-4 py-2 rounded hover:bg-blue-200"
-            >
-              Add Image URL
-            </button>
-          </div>
-        </div>
-        
-        {/* Origin Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Origin Information</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 mb-2">Country</label>
-              <input
-                type="text"
-                name="origin.country"
-                value={productData.origin.country}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Region</label>
-              <input
-                type="text"
-                name="origin.region"
-                value={productData.origin.region}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Cultivation Method</label>
-              <select
-                name="origin.cultivationMethod"
-                value={productData.origin.cultivationMethod}
-                onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-              >
-                <option value="organic">Organic</option>
-                <option value="conventional">Conventional</option>
-                <option value="wild-harvested">Wild Harvested</option>
-                <option value="biodynamic">Biodynamic</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        {/* Flavor Profile */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Flavor Profile</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 mb-2">Primary Flavors</label>
-              <div className="space-y-2">
-                {productData.flavorProfile.primary.map((flavor, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={flavor}
-                      onChange={(e) => handleArrayChange(e, index, 'flavorProfile.primary')}
-                      placeholder="Primary flavor"
-                      className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, 'flavorProfile.primary')}
-                      className="bg-red-100 text-red-600 p-2 rounded hover:bg-red-200"
-                      disabled={productData.flavorProfile.primary.length <= 1}
-                    >
-                      -
-                    </button>
-                  </div>
-                ))}
-                
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('flavorProfile.primary')}
-                  className="bg-blue-100 text-blue-600 px-4 py-2 rounded hover:bg-blue-200"
-                >
-                  Add Primary Flavor
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Tasting Notes</label>
-              <div className="space-y-2">
-                {productData.flavorProfile.notes.map((note, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={note}
-                      onChange={(e) => handleArrayChange(e, index, 'flavorProfile.notes')}
-                      placeholder="Tasting note"
-                      className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem(index, 'flavorProfile.notes')}
-                      className="bg-red-100 text-red-600 p-2 rounded hover:bg-red-200"
-                      disabled={productData.flavorProfile.notes.length <= 1}
-                    >
-                      -
-                    </button>
-                  </div>
-                ))}
-                
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('flavorProfile.notes')}
-                  className="bg-blue-100 text-blue-600 px-4 py-2 rounded hover:bg-blue-200"
-                >
-                  Add Tasting Note
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Intensity (1-5)</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="range"
-                  name="flavorProfile.intensity"
-                  min="1"
-                  max="5"
-                  value={productData.flavorProfile.intensity}
+                  name="name"
+                  value={productData.name}
                   onChange={handleChange}
-                  className="w-full"
+                  required
                 />
-                <span className="text-lg font-semibold">{productData.flavorProfile.intensity}</span>
               </div>
-            </div>
-            
-            <div>
-              <label className="block text-gray-700 mb-2">Flavor Characteristics</label>
-              <div className="grid grid-cols-3 gap-2">
-                {flavorOptions.map(flavor => (
-                  <label key={flavor} className="inline-flex items-center">
+              
+              <div className="form-group">
+                <label>Product Type <span className="required">*</span></label>
+                <select
+                  name="type"
+                  value={productData.type}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="spice">Spice</option>
+                  <option value="tea">Tea</option>
+                  <option value="blend">Blend</option>
+                </select>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Description <span className="required">*</span></label>
+                <textarea
+                  name="description"
+                  value={productData.description}
+                  onChange={handleChange}
+                  rows="4"
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="form-group">
+                <label>Price <span className="required">*</span></label>
+                <input
+                  type="number"
+                  name="price"
+                  value={productData.price}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Unit <span className="required">*</span></label>
+                <select
+                  name="unit"
+                  value={productData.unit}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="g">Grams (g)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                  <option value="oz">Ounces (oz)</option>
+                  <option value="lb">Pounds (lb)</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Stock <span className="required">*</span></label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={productData.stock}
+                  onChange={handleChange}
+                  min="0"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Status</label>
+                <div className="checkbox-group">
+                  <label className="checkbox-label">
                     <input
                       type="checkbox"
-                      value={flavor}
-                      checked={productData.flavorProfile.characteristics.includes(flavor)}
-                      onChange={handleCharacteristicsChange}
-                      className="form-checkbox h-4 w-4 text-green-600"
+                      name="isActive"
+                      checked={productData.isActive}
+                      onChange={(e) => setProductData({...productData, isActive: e.target.checked})}
                     />
-                    <span className="ml-2 text-sm">{flavor}</span>
+                    <span>Active</span>
                   </label>
-                ))}
+                  
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="featured"
+                      checked={productData.featured}
+                      onChange={(e) => setProductData({...productData, featured: e.target.checked})}
+                    />
+                    <span>Featured</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Categories */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 pb-2 border-b">Categories</h2>
           
-          <div className="space-y-2">
-            {productData.categories.map((category, index) => (
-              <div key={index} className="flex items-center space-x-2">
+          {/* Images */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Product Images</h2>
+              <p>Showcase your product with stunning imagery</p>
+            </div>
+            
+            <div className="array-items">
+              {productData.images.map((image, index) => (
+                <div key={index} className="array-item">
+                  <input
+                    type="text"
+                    value={image}
+                    onChange={(e) => handleArrayChange(e, index, 'images')}
+                    placeholder="Image URL"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(index, 'images')}
+                    className="remove-button"
+                    disabled={productData.images.length <= 1}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              
+              <button
+                type="button"
+                onClick={() => addArrayItem('images')}
+                className="add-button"
+              >
+                + Add Image URL
+              </button>
+            </div>
+          </div>
+          
+          {/* Origin Information */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Origin Information</h2>
+              <p>Tell the story of where your product comes from</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Country</label>
                 <input
                   type="text"
-                  value={category}
-                  onChange={(e) => handleArrayChange(e, index, 'categories')}
-                  placeholder="Category"
-                  className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
+                  name="origin.country"
+                  value={productData.origin.country}
+                  onChange={handleChange}
                 />
-                <button
-                  type="button"
-                  onClick={() => removeArrayItem(index, 'categories')}
-                  className="bg-red-100 text-red-600 p-2 rounded hover:bg-red-200"
-                  disabled={productData.categories.length <= 1}
-                >
-                  Remove
-                </button>
               </div>
-            ))}
+              
+              <div className="form-group">
+                <label>Region</label>
+                <input
+                  type="text"
+                  name="origin.region"
+                  value={productData.origin.region}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Cultivation Method</label>
+                <select
+                  name="origin.cultivationMethod"
+                  value={productData.origin.cultivationMethod}
+                  onChange={handleChange}
+                >
+                  <option value="organic">Organic</option>
+                  <option value="conventional">Conventional</option>
+                  <option value="wild-harvested">Wild Harvested</option>
+                  <option value="biodynamic">Biodynamic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          {/* Flavor Profile */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Flavor Profile</h2>
+              <p>Describe the unique taste experience</p>
+            </div>
             
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Primary Flavors</label>
+                <div className="array-items">
+                  {productData.flavorProfile.primary.map((flavor, index) => (
+                    <div key={index} className="array-item">
+                      <input
+                        type="text"
+                        value={flavor}
+                        onChange={(e) => handleArrayChange(e, index, 'flavorProfile.primary')}
+                        placeholder="Primary flavor"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem(index, 'flavorProfile.primary')}
+                        className="remove-button small"
+                        disabled={productData.flavorProfile.primary.length <= 1}
+                      >
+                        -
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('flavorProfile.primary')}
+                    className="add-button"
+                  >
+                    + Add Primary Flavor
+                  </button>
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Tasting Notes</label>
+                <div className="array-items">
+                  {productData.flavorProfile.notes.map((note, index) => (
+                    <div key={index} className="array-item">
+                      <input
+                        type="text"
+                        value={note}
+                        onChange={(e) => handleArrayChange(e, index, 'flavorProfile.notes')}
+                        placeholder="Tasting note"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem(index, 'flavorProfile.notes')}
+                        className="remove-button small"
+                        disabled={productData.flavorProfile.notes.length <= 1}
+                      >
+                        -
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('flavorProfile.notes')}
+                    className="add-button"
+                  >
+                    + Add Tasting Note
+                  </button>
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Intensity</label>
+                <div className="intensity-slider">
+                  <input
+                    type="range"
+                    name="flavorProfile.intensity"
+                    min="1"
+                    max="5"
+                    value={productData.flavorProfile.intensity}
+                    onChange={handleChange}
+                  />
+                  <span className="intensity-value">{productData.flavorProfile.intensity}</span>
+                </div>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Flavor Characteristics</label>
+                <div className="flavor-characteristics">
+                  {flavorOptions.map(flavor => (
+                    <label key={flavor} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value={flavor}
+                        checked={productData.flavorProfile.characteristics.includes(flavor)}
+                        onChange={handleCharacteristicsChange}
+                      />
+                      <span>{flavor}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Categories */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Categories</h2>
+              <p>Help customers find your product</p>
+            </div>
+            
+            <div className="array-items">
+              {productData.categories.map((category, index) => (
+                <div key={index} className="array-item">
+                  <input
+                    type="text"
+                    value={category}
+                    onChange={(e) => handleArrayChange(e, index, 'categories')}
+                    placeholder="Category"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem(index, 'categories')}
+                    className="remove-button"
+                    disabled={productData.categories.length <= 1}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              
+              <button
+                type="button"
+                onClick={() => addArrayItem('categories')}
+                className="add-button"
+              >
+                + Add Category
+              </button>
+            </div>
+          </div>
+          
+          {/* Submit Button */}
+          <div className="form-actions">
             <button
               type="button"
-              onClick={() => addArrayItem('categories')}
-              className="bg-blue-100 text-blue-600 px-4 py-2 rounded hover:bg-blue-200"
+              onClick={() => navigate('/admin/products')}
+              className="cancel-button"
             >
-              Add Category
+              Cancel
+            </button>
+            
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <LoadingSpinner size="small" color="white" />
+                  <span>Creating...</span>
+                </>
+              ) : (
+                'Create Magical Product ✨'
+              )}
             </button>
           </div>
-        </div>
-        
-        {/* Submit Button */}
-        <div className="flex justify-end mt-8">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/products')}
-            className="bg-gray-300 text-gray-800 px-6 py-2 rounded mr-2 hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 flex items-center"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating...
-              </>
-            ) : (
-              'Create Product'
-            )}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

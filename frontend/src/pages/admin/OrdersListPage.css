@@ -1,0 +1,325 @@
+/* Add this to your existing CSS or create a new admin.css file */
+
+.admin-container {
+  background-color: #f9f9fb;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+.admin-header {
+  background: linear-gradient(to right, #735557, #97866A);
+  padding: 3rem 2rem;
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.admin-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.bento-card {
+  background-color: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  background-color: #D6C0B3;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #40373A;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  color: #40373A;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #D6C0B3;
+  border-radius: 12px;
+  background-color: white;
+  color: #40373A;
+  cursor: pointer;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.orders-table-container {
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.orders-table th {
+  text-align: left;
+  padding: 1rem;
+  background-color: #f9f9fb;
+  color: #40373A;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+}
+
+.orders-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.orders-table tr:hover {
+  background-color: #f9f9fb;
+}
+
+.order-id-cell {
+  font-family: monospace;
+  color: #735557;
+  font-weight: 500;
+}
+
+.price-cell {
+  font-weight: 600;
+  color: #40373A;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-name {
+  font-weight: 500;
+  color: #40373A;
+}
+
+.customer-email {
+  font-size: 0.85rem;
+  color: #735557;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-paid {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.status-unpaid {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.status-delivered {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-button {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.view-button:hover {
+  background-color: #cbd5e1;
+}
+
+.deliver-button {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.deliver-button:hover {
+  background-color: #bbf7d0;
+}
+
+.empty-message {
+  text-align: center;
+  color: #735557;
+  padding: 2rem 0;
+  font-style: italic;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 0.25rem;
+}
+
+.pagination-button {
+  background-color: white;
+  border: 1px solid #D6C0B3;
+  color: #735557;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-button:hover {
+  background-color: #f9f5f2;
+}
+
+.pagination-button.active {
+  background-color: #D6C0B3;
+  color: #40373A;
+  font-weight: 600;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.error-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-icon {
+  font-size: 2rem;
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #735557;
+  margin-bottom: 1.5rem;
+}
+
+.retry-button {
+  background: linear-gradient(to right, #735557, #97866A);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .admin-content {
+    padding: 0 1rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .filter-controls {
+    width: 100%;
+  }
+  
+  .filter-select {
+    flex-grow: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header h1 {
+    font-size: 2rem;
+  }
+  
+  .orders-table {
+    display: block;
+  }
+  
+  .orders-table th:nth-child(3),
+  .orders-table th:nth-child(6),
+  .orders-table td:nth-child(3),
+  .orders-table td:nth-child(6) {
+    display: none;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .orders-table th:nth-child(2),
+  .orders-table td:nth-child(2) {
+    display: none;
+  }
+}

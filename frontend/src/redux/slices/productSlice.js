@@ -6,6 +6,9 @@ import axios from 'axios';
 const initialState = {
   products: [],
   product: null,
+  relatedProducts: [],
+  relatedLoading: false,
+  relatedError: null,
   loading: false,
   error: null,
   filters: {
@@ -16,6 +19,23 @@ const initialState = {
     maxPrice: ''
   }
 };
+
+export const fetchRelatedProducts = createAsyncThunk(
+  'products/fetchRelatedProducts',
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await productsAPI.getRelatedProducts(id);
+      return data;
+    } catch (error) {
+      console.error('Error fetching related products:', error);
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
@@ -104,6 +124,19 @@ const productSlice = createSlice({
       .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch product details';
+      })
+
+      .addCase(fetchRelatedProducts.pending, (state) => {
+        state.relatedLoading = true;
+        state.relatedError = null;
+      })
+      .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
+        state.relatedLoading = false;
+        state.relatedProducts = action.payload.data || [];
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
+        state.relatedLoading = false;
+        state.relatedError = action.payload || 'Failed to fetch related products';
       });
   }
 });

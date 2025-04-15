@@ -2,8 +2,26 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
+// Helper function to check if route should bypass auth
+const shouldBypassAuth = (req) => {
+  // List of paths that should bypass authentication
+  const publicPaths = [
+    { method: 'GET', regex: /^\/api\/products\/related\/[^\/]+$/ }
+  ];
+  
+  // Check if the current request matches any public path
+  return publicPaths.some(path => {
+    return req.method === path.method && path.regex.test(req.originalUrl);
+  });
+};
+
+
 // Protect routes - verify token
 exports.protect = async (req, res, next) => {
+  if (shouldBypassAuth(req)) {
+    return next();
+  }
+
   try {
     let token;
     
@@ -59,6 +77,11 @@ exports.protect = async (req, res, next) => {
 // Restrict to certain roles
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
+
+    if (shouldBypassAuth(req)) {
+      return next();
+    }
+    
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         status: 'fail',

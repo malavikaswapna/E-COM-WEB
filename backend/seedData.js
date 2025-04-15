@@ -26,10 +26,26 @@ const products = [
     images: ['https://i.imgur.com/0N3EYfS.jpeg'],
     origin: {
       country: 'Sri Lanka',
-      region: 'Central Province',
-      farm: 'Highland Spice Farm',
+      region: 'Matale',
+      farm: 'Highland Spice Garden',
+      coordinates: {
+        latitude: 7.62676,
+        longitude: 80.63640
+      },
+      altitude: '1,200-1,829m',
       cultivationMethod: 'organic'
     },
+
+    // Add producer information
+  producerInfo: {
+    story: "Our partners at this farm have been growing premium spices for generations, using traditional organic methods that preserve the unique terroir of the region.",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/79/e6/75/highland-spice-garden.jpg?w=1200&h=-1&s=1",
+      "https://cdn.getyourguide.com/img/tour/032c9ae7347c97e12b045a2dd511b337a33e6cc2671cf1e43240afdc6bb80eb3.jpg/146.jpg"
+    ],
+    sustainablePractices: ['Organic', 'Fair Trade', 'Rainforest Alliance']
+  },
+
     flavorProfile: {
       primary: ['Sweet', 'Warm'],
       notes: ['Floral', 'Citrus', 'Honey'],
@@ -67,6 +83,17 @@ const products = [
       altitude: '1,200-1,800m',
       cultivationMethod: 'organic'
     },
+
+    // Add producer information
+  producerInfo: {
+    story: "Our partners at this farm have been growing premium spices for generations, using traditional organic methods that preserve the unique terroir of the region.",
+    images: [
+      "https://assets.bbhub.io/media/sites/14/2015/08/Tea03.jpg",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/a7/ac/b9/caption.jpg?w=1200&h=-1&s=1"
+    ],
+    sustainablePractices: ['Organic', 'Fair Trade', 'Rainforest Alliance']
+  },
+
     flavorProfile: {
       primary: ['Floral', 'Muscatel'],
       notes: ['Grape', 'Citrus', 'Honey'],
@@ -96,8 +123,24 @@ const products = [
     origin: {
       country: 'Spain',
       region: 'Extremadura',
+      farm: 'Finca La Barca',
+      coordinates: {
+        latitude: 40.000979,
+        longitude: -6.09983
+      },
+      altitude: '1,200-1,800m',
       cultivationMethod: 'conventional'
     },
+
+    // Add producer information
+    producerInfo: {
+      story: "Our partners at this farm have been growing premium spices for generations, using traditional organic methods that preserve the unique terroir of the region.",
+      images: [
+        "https://valenciafruits.com/wp-content/uploads/2023/08/3.jpeg",
+        "https://estaticos-cdn.prensaiberica.es/clip/bdcf76e1-cda7-45fd-8c21-5cdeb86891cb_source-aspect-ratio_default_0_x376y1298.jpg"
+      ],
+    sustainablePractices: ['Organic', 'Fair Trade', 'Rainforest Alliance']
+  },
     flavorProfile: {
       primary: ['Smoky', 'Sweet'],
       notes: ['Oak', 'Pepper', 'Earthy'],
@@ -127,6 +170,7 @@ const products = [
     origin: {
       country: 'China',
       region: 'Fujian Province',
+      farm: 'Highland Spice Garden',
       coordinates: {
         latitude: 26.0789,
         longitude: 119.2987
@@ -163,8 +207,25 @@ const products = [
     origin: {
       country: 'India',
       region: 'Kerala',
+      farm: 'Njallaniyil Cardamom Plantations',
+      coordinates: {
+        latitude: 9.76145,
+        longitude: 77.13805
+      },
+      altitude: '600-1,500m',
       cultivationMethod: 'organic'
     },
+
+    // Add producer information
+    producerInfo: {
+      story: "Our partners at this farm have been growing premium spices for generations, using traditional organic methods that preserve the unique terroir of the region.",
+      images: [
+        "https://wideangleadventure.com/wp-content/uploads/2015/04/Cardamom-Plantation-Munnar-2-of-6.jpg",
+        "https://www.thekodaichronicle.com/wp-content/uploads/2024/07/Cardamom-plant-Shabin-Shajan.jpg"
+      ],
+      sustainablePractices: ['Organic', 'Fair Trade', 'Rainforest Alliance']
+  },
+
     flavorProfile: {
       primary: ['Aromatic', 'Sweet'],
       notes: ['Citrus', 'Eucalyptus', 'Mint'],
@@ -194,7 +255,27 @@ const products = [
     origin: {
       country: 'Multiple',
       region: 'Blend',
-      cultivationMethod: 'conventional' // Changed from 'mixed' to 'conventional'
+      farm: 'Main Blending House',
+      coordinates: {             
+        latitude: 12.9716,
+        longitude: 77.5946
+      },
+      cultivationMethod: 'conventional',
+      // Add blender information
+      producerInfo: {
+        story: "Our master blenders carefully craft each blend using premium ingredients selected from around the world. Each component is chosen for its unique qualities and how it contributes to the overall profile.",
+        images: [
+          "https://images.unsplash.com/photo-1517128317859-541a299307cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1334&q=80",
+          "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-1.2.1&auto=format&fit=crop&w=1334&q=80"
+        ],
+        sustainablePractices: ['Fair Trade', 'Small Batch', 'Recyclable Packaging']
+      },
+      components: [
+        { name: 'Black Tea', country: 'India', region: 'Assam' },
+        { name: 'Cardamom', country: 'India', region: 'Kerala' },
+        { name: 'Lemongrass', country: 'India', region: 'Kerala' },
+        { name: 'Mint', country: 'Morocco', region: 'Meknes' }
+      ],
     },
     flavorProfile: {
       primary: ['Spicy', 'Refreshing'],

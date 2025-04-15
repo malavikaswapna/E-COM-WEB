@@ -306,3 +306,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+.bento-product-item img {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}

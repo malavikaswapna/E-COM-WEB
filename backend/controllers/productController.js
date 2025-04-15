@@ -124,6 +124,41 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
+// Get related products
+exports.getRelatedProducts = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    
+    if (!product) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Product not found'
+      });
+    }
+    
+    // Find products of the same type, excluding the current product
+    const relatedProducts = await Product.find({
+      _id: { $ne: product._id },
+      $or: [
+        { type: product.type },
+        { 'flavorProfile.characteristics': { $in: product.flavorProfile?.characteristics || [] } },
+        { 'origin.country': product.origin?.country }
+      ]
+    }).limit(4);
+    
+    res.json({
+      status: 'success',
+      results: relatedProducts.length,
+      data: relatedProducts
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+};
+
 // Search Bar
 exports.searchProducts = async (req, res) => {
   try {

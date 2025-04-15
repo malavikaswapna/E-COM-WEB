@@ -90,7 +90,8 @@
   width: 100%;
   height: auto;
   max-height: 400px;
-  object-fit: contain;
+  max-width: 100%;
+  object-fit: cover;
   border-radius: 12px;
 }
 
@@ -625,30 +626,154 @@
   }
   
   /* Related Products and Recipes Cards */
-  .related-products-content,
-  .recipes-content {
+  .bento-card {
+    margin-bottom: 2rem;
+  }
+
+  .no-related-products, 
+  .recipes-placeholder {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background-color: #f9f9fb;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+  .related-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .related-product-item {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .related-product-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .related-product-image {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+  }
+  
+  .related-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .related-product-type-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #735557;
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: capitalize;
+  }
+  
+  .related-product-info {
+    padding: 0.75rem;
+  }
+  
+  .related-product-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #40373A;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .related-product-origin {
+    font-size: 0.75rem;
+    color: #735557;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .related-product-price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #735557;
+  }
+  
+  .loading-related {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #735557;
+  }
+  
+  .spinner-small {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(115, 85, 87, 0.3);
+    border-radius: 50%;
+    border-top-color: #735557;
+    animation: spin 1s linear infinite;
+    margin-bottom: 0.75rem;
+  }
+  
+  .no-related-products {
+    text-align: center;
     padding: 1.5rem;
   }
   
-  .related-products-message,
-  .recipes-message {
-    margin-bottom: 1rem;
+  .browse-all-link {
+    display: inline-block;
+    margin-top: 1rem;
     color: #735557;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #735557;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .browse-all-link:hover {
+    background-color: #735557;
+    color: white;
   }
   
-  .related-products-placeholder,
-  .recipes-placeholder {
-    min-height: 150px;
-    background-color: #f9f9fb;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* Recipes placeholder styling */
+  .recipes-message {
+    margin-bottom: 1.5rem;
   }
   
   .placeholder-message {
-    color: #735557;
     font-style: italic;
+    color: #735557;
+  }
+  
+  @media (max-width: 768px) {
+    .related-products-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .related-products-grid {
+      grid-template-columns: 1fr;
+    }
   }
   
   /* Loading, Error, and Not Found States */
@@ -745,6 +870,15 @@
   }
   
   @media (max-width: 768px) {
+
+    .product-image-container {
+      padding: 1rem;
+    }
+  
+    .product-main-image {
+      max-height: 300px;
+    }
+
     .product-detail-grid {
       grid-template-columns: 1fr;
     }
@@ -815,4 +949,104 @@
     .details-grid {
       grid-template-columns: 1fr;
     }
+
+    .product-main-image {
+      max-height: 250px;
+    }
   }
+
+  /* Add to your ProductDetailPage.css file */
+
+/* Blend-specific styles */
+.blend-info {
+  background-color: #f9f9fb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.blend-info h4 {
+  font-weight: 600;
+  color: #40373A;
+  margin-bottom: 1rem;
+}
+
+.blend-components-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.blend-component-item {
+  background-color: #D6C0B3;
+  color: #40373A;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Updated detail item styles for blend products */
+.detail-item.blend {
+  background-color: #F4EBE4;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+/* Origin section for blend products */
+.origin-blend-info {
+  background-color: #f9f9fb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.origin-blend-info h4 {
+  font-weight: 600;
+  color: #40373A;
+  margin-bottom: 0.75rem;
+}
+
+.origin-blend-info p {
+  color: #40373A;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+/* Enhanced styling for Blended On date in storage tab */
+.freshness-item.blend-date {
+  background-color: #F4EBE4;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.freshness-item.blend-date .freshness-label {
+  color: #735557;
+  font-weight: 600;
+}
+
+.freshness-item.blend-date .freshness-value {
+  color: #40373A;
+  font-weight: 500;
+}
+
+/* Blend tag in product header */
+.product-type-badge.blend {
+  background-color: rgba(115, 85, 87, 0.8);
+  color: white;
+}
+
+/* Responsive adjustments for blend components */
+@media (max-width: 768px) {
+  .blend-components-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .blend-components-list {
+    grid-template-columns: 1fr;
+  }
+}

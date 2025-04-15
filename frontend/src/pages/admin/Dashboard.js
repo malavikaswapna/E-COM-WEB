@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import './AdminDashboard.css'; // We'll create this next
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -88,149 +89,188 @@ const Dashboard = () => {
   
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="admin-loading-container">
+        <div className="spinner"></div>
+        <p>Loading dashboard data...</p>
       </div>
     );
   }
   
   if (error) {
     return (
-      <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
-        {error}
+      <div className="admin-error-container">
+        <div className="error-icon">❌</div>
+        <h2>Error Loading Dashboard</h2>
+        <p>{error}</p>
       </div>
     );
   }
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-      
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Total Orders</h2>
-          <p className="text-3xl font-bold text-gray-800">{stats.totalOrders}</p>
-          <Link to="/admin/orders" className="text-blue-500 text-sm mt-3 inline-block hover:underline">
-            View all orders →
-          </Link>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Pending Orders</h2>
-          <p className="text-3xl font-bold text-gray-800">{stats.pendingOrders}</p>
-          <Link to="/admin/orders" className="text-blue-500 text-sm mt-3 inline-block hover:underline">
-            View pending orders →
-          </Link>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Total Revenue</h2>
-          <p className="text-3xl font-bold text-gray-800">{formatCurrency(stats.totalRevenue)}</p>
-          <span className="text-gray-500 text-sm mt-3 inline-block">
-            From all completed orders
-          </span>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Products</h2>
-          <p className="text-3xl font-bold text-gray-800">{stats.totalProducts}</p>
-          <Link to="/admin/products" className="text-blue-500 text-sm mt-3 inline-block hover:underline">
-            Manage products →
-          </Link>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Low Stock Products</h2>
-          <p className="text-3xl font-bold text-gray-800">{stats.lowStockProducts}</p>
-          <Link to="/admin/products" className="text-blue-500 text-sm mt-3 inline-block hover:underline">
-            View inventory →
-          </Link>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-indigo-500">
-          <h2 className="text-gray-500 text-sm uppercase mb-1">Customers</h2>
-          <p className="text-3xl font-bold text-gray-800">{stats.totalUsers}</p>
-          <Link to="/admin/users" className="text-blue-500 text-sm mt-3 inline-block hover:underline">
-            Manage users →
-          </Link>
-        </div>
+    <div className="admin-dashboard-container">
+      <div className="admin-dashboard-header">
+        <h1>Admin Dashboard ✨</h1>
+        <p>Manage your magical products and orders</p>
       </div>
       
-      {/* Quick Actions */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            to="/admin/products/create"
-            className="bg-green-100 hover:bg-green-200 p-4 rounded-lg flex items-center justify-center text-green-800 font-medium"
-          >
-            Add New Product
-          </Link>
-          
-          <Link
-            to="/admin/orders"
-            className="bg-blue-100 hover:bg-blue-200 p-4 rounded-lg flex items-center justify-center text-blue-800 font-medium"
-          >
-            Manage Orders
-          </Link>
-          
-          <Link
-            to="/admin/products"
-            className="bg-yellow-100 hover:bg-yellow-200 p-4 rounded-lg flex items-center justify-center text-yellow-800 font-medium"
-          >
-            Update Inventory
-          </Link>
-        </div>
-      </div>
-      
-      {/* Recent Activities - This would be populated from recent activities in a real app */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-        <div className="space-y-4">
-          <div className="flex items-start">
-            <div className="bg-green-100 p-2 rounded-full mr-3">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-800">New order placed</p>
-              <p className="text-sm text-gray-500">Order #12345 - $78.99</p>
-              <p className="text-xs text-gray-400">Just now</p>
+      <div className="admin-dashboard-content">
+        {/* Stats Overview */}
+        <div className="stats-grid">
+          <div className="bento-card stat-card orders-card">
+            <div className="stat-icon">📦</div>
+            <div className="stat-content">
+              <h2>Total Orders</h2>
+              <p className="stat-value">{stats.totalOrders}</p>
+              <Link to="/admin/orders" className="stat-link">
+                View all orders →
+              </Link>
             </div>
           </div>
           
-          <div className="flex items-start">
-            <div className="bg-blue-100 p-2 rounded-full mr-3">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-gray-800">Product inventory updated</p>
-              <p className="text-sm text-gray-500">Ceylon Cinnamon - 32 units added</p>
-              <p className="text-xs text-gray-400">2 hours ago</p>
+          <div className="bento-card stat-card pending-card">
+            <div className="stat-icon">⏳</div>
+            <div className="stat-content">
+              <h2>Pending Orders</h2>
+              <p className="stat-value">{stats.pendingOrders}</p>
+              <Link to="/admin/orders" className="stat-link">
+                View pending orders →
+              </Link>
             </div>
           </div>
           
-          <div className="flex items-start">
-            <div className="bg-yellow-100 p-2 rounded-full mr-3">
-              <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <div className="bento-card stat-card revenue-card">
+            <div className="stat-icon">💰</div>
+            <div className="stat-content">
+              <h2>Total Revenue</h2>
+              <p className="stat-value">{formatCurrency(stats.totalRevenue)}</p>
+              <span className="stat-note">
+                From all completed orders
+              </span>
             </div>
-            <div>
-              <p className="text-gray-800">New user registered</p>
-              <p className="text-sm text-gray-500">john.doe@example.com</p>
-              <p className="text-xs text-gray-400">5 hours ago</p>
+          </div>
+          
+          <div className="bento-card stat-card products-card">
+            <div className="stat-icon">🧂</div>
+            <div className="stat-content">
+              <h2>Products</h2>
+              <p className="stat-value">{stats.totalProducts}</p>
+              <Link to="/admin/products" className="stat-link">
+                Manage products →
+              </Link>
+            </div>
+          </div>
+          
+          <div className="bento-card stat-card inventory-card">
+            <div className="stat-icon">⚠️</div>
+            <div className="stat-content">
+              <h2>Low Stock Products</h2>
+              <p className="stat-value">{stats.lowStockProducts}</p>
+              <Link to="/admin/products" className="stat-link">
+                View inventory →
+              </Link>
+            </div>
+          </div>
+          
+          <div className="bento-card stat-card users-card">
+            <div className="stat-icon">👤</div>
+            <div className="stat-content">
+              <h2>Customers</h2>
+              <p className="stat-value">{stats.totalUsers}</p>
+              <Link to="/admin/users" className="stat-link">
+                Manage users →
+              </Link>
             </div>
           </div>
         </div>
         
-        <button className="mt-4 text-blue-600 hover:text-blue-800 text-sm">
-          View all activity →
-        </button>
+        {/* Quick Actions */}
+        <div className="bento-card actions-card">
+          <div className="card-header">
+            <h2>Quick Actions</h2>
+          </div>
+          <div className="card-content">
+            <div className="quick-actions-grid">
+              <Link
+                to="/admin/products/create"
+                className="action-button action-create"
+              >
+                <span className="action-icon">✨</span>
+                Add New Product
+              </Link>
+              
+              <Link
+                to="/admin/orders"
+                className="action-button action-orders"
+              >
+                <span className="action-icon">📋</span>
+                Manage Orders
+              </Link>
+              
+              <Link
+                to="/admin/products"
+                className="action-button action-inventory"
+              >
+                <span className="action-icon">🔄</span>
+                Update Inventory
+              </Link>
+              
+              <Link
+                to="/admin/subscriptions"
+                className="action-button action-subscription"
+              >
+                <span className="action-icon">📦</span>
+                Manage Subscriptions
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        {/* Recent Activities */}
+        <div className="bento-card activities-card">
+          <div className="card-header">
+            <h2>Recent Activity</h2>
+          </div>
+          <div className="card-content">
+            <div className="activity-list">
+              <div className="activity-item">
+                <div className="activity-icon activity-icon-green">
+                  <span>✓</span>
+                </div>
+                <div className="activity-content">
+                  <p className="activity-title">New order placed</p>
+                  <p className="activity-subtitle">Order #12345 - $78.99</p>
+                  <p className="activity-time">Just now</p>
+                </div>
+              </div>
+              
+              <div className="activity-item">
+                <div className="activity-icon activity-icon-blue">
+                  <span>🔄</span>
+                </div>
+                <div className="activity-content">
+                  <p className="activity-title">Product inventory updated</p>
+                  <p className="activity-subtitle">Ceylon Cinnamon - 32 units added</p>
+                  <p className="activity-time">2 hours ago</p>
+                </div>
+              </div>
+              
+              <div className="activity-item">
+                <div className="activity-icon activity-icon-yellow">
+                  <span>👤</span>
+                </div>
+                <div className="activity-content">
+                  <p className="activity-title">New user registered</p>
+                  <p className="activity-subtitle">john.doe@example.com</p>
+                  <p className="activity-time">5 hours ago</p>
+                </div>
+              </div>
+            </div>
+            
+            <button className="view-all-button">
+              View all activity →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

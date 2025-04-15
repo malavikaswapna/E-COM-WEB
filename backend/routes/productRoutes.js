@@ -5,7 +5,9 @@ const Product = require('../models/productModel');
 const productController = require('../controllers/productController');
 const authController = require('../controllers/authController');
 
+
 // Admin routes for CRUD operations would go here
+router.get('/related/:id', productController.getRelatedProducts);
 router.get('/', productController.getProducts);
 router.get('/:id', productController.getProductById);
 

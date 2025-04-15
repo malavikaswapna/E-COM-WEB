@@ -1,0 +1,53 @@
+/* frontend/src/components/products/FlavorMatchBadge.css */
+.flavor-match-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.match-icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 0.25rem;
+  fill: currentColor;
+}
+
+.match-label {
+  white-space: nowrap;
+}
+
+/* Match variant styles */
+.flavor-match-badge.perfect-match {
+  background-color: #dcfce7;  /* Light green background */
+  color: #16a34a;  /* Dark green text */
+}
+
+.flavor-match-badge.great-match {
+  background-color: #dbeafe;  /* Light blue background */
+  color: #2563eb;  /* Dark blue text */
+}
+
+.flavor-match-badge.good-match {
+  background-color: #fef9c3;  /* Light yellow background */
+  color: #ca8a04;  /* Dark yellow/gold text */
+}
+
+.flavor-match-badge.fair-match {
+  background-color: #ffedd5;  /* Light orange background */
+  color: #ea580c;  /* Dark orange text */
+}
+
+.flavor-match-badge.no-match {
+  background-color: #f3f4f6;  /* Light gray background */
+  color: #6b7280;  /* Dark gray text */
+}
+
+/* Hover effects for better interactivity */
+.flavor-match-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}

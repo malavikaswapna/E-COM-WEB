@@ -7,7 +7,7 @@
 }
 
 .order-header {
-  background: linear-gradient(to right, #735557, #97866A);
+  background: linear-gradient(to right, #c38053, #ccc2b2);
   padding: 3rem 2rem;
   color: white;
   text-align: center;
@@ -28,7 +28,8 @@
 
 .order-date {
   font-size: 1rem;
-  opacity: 0.9;
+  opacity: 1;
+  
 }
 
 /* Order Content */

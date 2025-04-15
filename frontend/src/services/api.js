@@ -46,6 +46,10 @@ api.interceptors.response.use(
   }
 );
 
+export const recipesAPI = {
+  searchByIngredient: (ingredient) => api.get('/recipes/search', { params: { ingredient } })
+};
+
 // Auth API
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
@@ -57,6 +61,7 @@ export const authAPI = {
 export const productsAPI = {
   getProducts: (filters) => api.get('/products', { params: filters }),
   getProductById: (id) => api.get(`/products/${id}`),
+  getRelatedProducts: (id) => api.get(`/product-suggestions/${id}`),
   // Admin methods
   createProduct: (productData) => api.post('/products', productData),
   updateProduct: (id, productData) => api.put(`/products/${id}`, productData),

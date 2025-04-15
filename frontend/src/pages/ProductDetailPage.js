@@ -2,29 +2,67 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchProductById } from '../redux/slices/productSlice';
+import { fetchProductById, fetchRelatedProducts } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
 import OriginMap from '../components/products/EnhancedOriginMap';
 import { toast } from 'react-toastify';
 import './ProductDetailPage.css';
+import { recipesAPI } from '../services/api';
+import RecipeCard from '../components/recipes/RecipeCard';
+
 
 const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedUnit, setSelectedUnit] = useState('g');
   const [addedToCart, setAddedToCart] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
+  const [recipes, setRecipes] = useState([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
+
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-  
-  const { product, loading, error } = useSelector((state) => state.products);
+
+  const { product, loading, error, relatedProducts, relatedLoading } = useSelector((state) => state.products);
+
+  useEffect(() => {
+    if (product && product.name) {
+      setRecipesLoading(true);
+
+      // Extract the main ingredient from the product name
+    const searchTerm = product.name.split(' ')[0];
+    
+    recipesAPI.searchByIngredient(searchTerm)
+      .then(response => {
+        setRecipes(response.data.data || []);
+        setRecipesLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching recipes:', error);
+        setRecipesLoading(false);
+      });
+  }
+}, [product]);
   
   useEffect(() => {
     dispatch(fetchProductById(id));
     setAddedToCart(false);
     window.scrollTo(0, 0);
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (product && product._id) {
+      dispatch(fetchRelatedProducts(product._id))
+      .unwrap()
+      .then(data => {
+        console.log('Related products response:', data);
+      })
+      .catch(error => {
+        console.error('Error fetching related products:', error);
+      });
+  }
+  }, [dispatch, product]);
   
   const handleAddToCart = () => {
     dispatch(
@@ -46,9 +84,18 @@ const ProductDetailPage = () => {
     navigate('/cart');
   };
   
+  // Determine if product is a blend
+  const isBlendProduct = (product) => {
+    return product && product.type === 'blend';
+  };
+  
   // Origin detail display formatting
   const getOriginDetails = () => {
     if (!product?.origin) return 'Information not available';
+    
+    if (isBlendProduct(product)) {
+      return 'Various origins, blended in-house';
+    }
     
     const { country, region, farm } = product.origin;
     let details = country;
@@ -360,7 +407,11 @@ const ProductDetailPage = () => {
                     
                     <div className="detail-item">
                       <span className="detail-label">Origin:</span>
-                      <span className="detail-value">{getOriginDetails()}</span>
+                      <span className="detail-value">
+                        {isBlendProduct(product) 
+                          ? 'Various origins, blended in-house' 
+                          : getOriginDetails()}
+                      </span>
                     </div>
                     
                     <div className="detail-item">
@@ -373,15 +424,24 @@ const ProductDetailPage = () => {
                       <span className="detail-value">{formatHarvestDate(product.batchInfo?.bestBefore)}</span>
                     </div>
                     
-                    <div className="detail-item">
-                      <span className="detail-label">Harvest Date:</span>
-                      <span className="detail-value">{formatHarvestDate(product.origin?.harvestDate)}</span>
-                    </div>
+                    {!isBlendProduct(product) && (
+                      <div className="detail-item">
+                        <span className="detail-label">Harvest Date:</span>
+                        <span className="detail-value">{formatHarvestDate(product.origin?.harvestDate)}</span>
+                      </div>
+                    )}
                     
-                    <div className="detail-item">
-                      <span className="detail-label">Cultivation:</span>
-                      <span className="detail-value">{product.origin?.cultivationMethod || 'Not specified'}</span>
-                    </div>
+                    {isBlendProduct(product) ? (
+                      <div className="detail-item">
+                        <span className="detail-label">Blended On:</span>
+                        <span className="detail-value">{formatHarvestDate(product.batchInfo?.productionDate)}</span>
+                      </div>
+                    ) : (
+                      <div className="detail-item">
+                        <span className="detail-label">Cultivation:</span>
+                        <span className="detail-value">{product.origin?.cultivationMethod || 'Not specified'}</span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="product-description-full">
@@ -456,15 +516,15 @@ const ProductDetailPage = () => {
               {activeTab === 'origin' && (
                 <div className="origin-tab">
                   <OriginMap 
-                    product={product} 
+                    product={product}
                     productName={product.name}
                     producerInfo={{
                       story: "Our partners at this farm have been growing premium spices for generations, using traditional organic methods that preserve the unique terroir of the region.",
                       images: [
-                        "https://images.unsplash.com/photo-1558818061-c8e3ba22672a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1334&q=80",
-                        "https://images.unsplash.com/photo-1589563413363-64114ef4acdf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1334&q=80"
+                        "https://wideangleadventure.com/wp-content/uploads/2015/04/Cardamom-Plantation-Munnar-2-of-6.jpg",
+                        "https://estaticos-cdn.prensaiberica.es/clip/bdcf76e1-cda7-45fd-8c21-5cdeb86891cb_source-aspect-ratio_default_0_x376y1298.jpg"
                       ]
-                    }}
+                    }} 
                   />
                 </div>
               )}
@@ -501,7 +561,9 @@ const ProductDetailPage = () => {
                       <div className="freshness-info">
                         <h4>Freshness Information</h4>
                         <div className="freshness-item">
-                          <span className="freshness-label">Production Date:</span>
+                          <span className="freshness-label">
+                            {isBlendProduct(product) ? 'Blended On:' : 'Production Date:'}
+                          </span>
                           <span className="freshness-value">
                             {formatHarvestDate(product.batchInfo?.productionDate) || 'Not available'}
                           </span>
@@ -532,39 +594,89 @@ const ProductDetailPage = () => {
           
           {/* Related Products Card */}
           <div className="bento-card related-products-card">
-            <div className="card-header">
-              <h2>You Might Also Like ✨</h2>
+  <div className="card-header">
+    <h2>You Might Also Like ✨</h2>
+  </div>
+  <div className="related-products-content">
+    {relatedLoading ? (
+      <div className="loading-related">
+        <div className="spinner-small"></div>
+        <p>Discovering similar treasures...</p>
+      </div>
+    ) : relatedProducts && relatedProducts.length > 0 ? (
+      <div className="related-products-grid">
+        {relatedProducts.slice(0, 4).map((relatedProduct) => (
+          <div 
+            key={relatedProduct._id} 
+            className="related-product-item" 
+            onClick={() => navigate(`/products/${relatedProduct._id}`)}
+          >
+            <div className="related-product-image">
+              <img 
+                src={relatedProduct.images && relatedProduct.images.length > 0 
+                  ? relatedProduct.images[0] 
+                  : '/images/placeholder-spice.jpg'} 
+                alt={relatedProduct.name} 
+              />
+              <div className="related-product-type-badge">
+                {relatedProduct.type}
+              </div>
             </div>
-            <div className="related-products-content">
-              <p className="related-products-message">
-                Based on your browsing, these magical flavors might interest you:
+            <div className="related-product-info">
+              <h3 className="related-product-name">{relatedProduct.name}</h3>
+              <p className="related-product-origin">
+                {relatedProduct.type === 'blend' 
+                  ? 'Various origins, blended' 
+                  : relatedProduct.origin?.country || 'Origin not specified'}
               </p>
-              
-              <div className="related-products-placeholder">
-                <div className="placeholder-message">
-                  Related products will appear here
-                </div>
+              <div className="related-product-price">
+                ${relatedProduct.price ? relatedProduct.price.toFixed(2) : '0.00'}
               </div>
             </div>
           </div>
+        ))}
+      </div>
+    ) : (
+      <div className="no-related-products">
+        <p>No related products found for this item.</p>
+        <Link to="/products" className="browse-all-link">
+          Browse all products
+        </Link>
+      </div>
+    )}
+  </div>
+</div>
           
           {/* Recipes and Inspiration Card */}
           <div className="bento-card recipes-card">
-            <div className="card-header">
-              <h2>Recipes & Inspiration ✨</h2>
-            </div>
-            <div className="recipes-content">
-              <p className="recipes-message">
-                Discover magical ways to use {product.name} in your culinary adventures:
-              </p>
-              
-              <div className="recipes-placeholder">
-                <div className="placeholder-message">
-                  Recipe suggestions coming soon!
-                </div>
-              </div>
-            </div>
-          </div>
+  <div className="card-header">
+    <h2>Recipes & Inspiration ✨</h2>
+  </div>
+  <div className="recipes-content">
+    <p className="recipes-message">
+      Discover magical ways to use {product.name} in your culinary adventures:
+    </p>
+    
+    {recipesLoading ? (
+      <div className="loading-related">
+        <div className="spinner-small"></div>
+        <p>Finding delicious recipes...</p>
+      </div>
+    ) : recipes && recipes.length > 0 ? (
+      <div className="recipes-grid">
+        {recipes.map(recipe => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
+      </div>
+    ) : (
+      <div className="recipes-placeholder">
+        <div className="placeholder-message">
+          Recipe suggestions coming soon!
+        </div>
+      </div>
+    )}
+  </div>
+</div>
         </div>
       </div>
     </div>
