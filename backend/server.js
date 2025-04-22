@@ -5,10 +5,17 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const axios = require('axios');
+const passport = require('passport');
+const session = require('express-session');
+const path = require('path');
 require('dotenv').config();
+
+// Load the auth controller to ensure Passport strategies are initialized
+require('./controllers/authController');
 
 const app = express();
 const productController = require('./controllers/productController');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Middleware
 app.use(morgan('dev'));
@@ -17,9 +24,24 @@ app.use(express.json());
 
 // Update the cors configuration
 app.use(cors({
-  origin: 'http://localhost:3001', // Your frontend URL
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001', // Your frontend URL
   credentials: true
 }));
+
+// Session middleware (required for Passport)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI)
@@ -101,13 +123,23 @@ app.get('/api/product-suggestions/:id', async (req, res) => {
   }
 });
 
-// Import routes (we'll create these next)
+// Import routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
+app.use('/api/marketing', require('./routes/marketingRoutes'));
+
+// If in production, serve frontend static files
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {

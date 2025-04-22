@@ -1,5 +1,5 @@
 // frontend/src/pages/ShippingPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { saveShippingAddress } from '../redux/slices/cartSlice';
@@ -7,6 +7,7 @@ import './ShippingPage.css';
 
 const ShippingPage = () => {
   const { shippingAddress } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
   
   const [address, setAddress] = useState(shippingAddress.address || '');
   const [city, setCity] = useState(shippingAddress.city || '');
@@ -24,6 +25,7 @@ const ShippingPage = () => {
         city,
         postalCode,
         country,
+        userId: user?._id,
       })
     );
     navigate('/payment');

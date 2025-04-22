@@ -82,6 +82,10 @@ const RegisterPage = () => {
       default: return '';
     }
   };
+
+  const handleSocialLogin = (provider) => {
+    window.location.href = `/api/auth/${provider}`;
+  };
   
   return (
     <div className="register-container">
@@ -188,14 +192,16 @@ const RegisterPage = () => {
             </button>
           </form>
           
-          <div className="register-divider">Or continue with ✨</div>
+          <div className="register-divider"><span>Or continue with </span></div>
           
           <div className="register-social">
-            <button className="register-social-button">
+            <button className="register-social-button google button"
+             onClick={() => handleSocialLogin('google')}
+             type="button"
+             disabled={loading}
+            >
+              <span className="social-icon">🔍</span>
               Google 🎀
-            </button>
-            <button className="register-social-button">
-              Facebook ❤️
             </button>
           </div>
           

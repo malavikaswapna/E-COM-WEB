@@ -137,25 +137,59 @@
   
   .register-divider {
     text-align: center;
-    color: #0e1115;
+    color: #735557;
     margin: 24px 0;
+    position: relative;
+    font-weight: 500;
   }
-  
-  .register-social {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
+
+  .register-divider span {
+    background-color: #D6C0B3; 
+    padding: 0 15px; 
+    position: relative; 
+    z-index: 1; 
   }
+
+.register-divider::before,
+.register-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background-color: #735557;
+  z-index: 0; /* Put the lines behind the text */
+}
+
+.register-divider::before {
+  left: 0;
+}
+
+.register-divider::after {
+  right: 0;
+}
+
+.register-social {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
   
   .register-social-button {
-    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    width: 200px;
+    margin: 0 auto;
     border: 1px solid #735557;
     border-radius: 12px;
-    background: none;
+    background: white;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     text-align: center;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .register-social-button:hover {
@@ -176,6 +210,23 @@
   .register-login-link a:hover {
     text-decoration: underline;
   }
+
+  .social-icon {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+
+  /* Google button specific styling */
+.google-button {
+  color: #7C444F;
+  border-color: #DB4437;
+}
+
+.google-button:hover {
+  background-color: #DB4437;
+  color: white;
+  box-shadow: 0 4px 8px rgba(219, 68, 55, 0.3);
+}
   
   @media (max-width: 640px) {
     .register-form {

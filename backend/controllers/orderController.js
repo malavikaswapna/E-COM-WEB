@@ -9,6 +9,7 @@ exports.createOrder = async (req, res) => {
       orderItems,
       shippingAddress,
       paymentMethod,
+      paymentDetails,
       taxPrice,
       shippingPrice,
       totalPrice
@@ -20,6 +21,23 @@ exports.createOrder = async (req, res) => {
         message: 'No order items'
       });
     }
+
+    // Set initial payment status
+    let isPaid = false;
+    let paidAt = null;
+    let paymentResult = null;
+    
+    // If Stripe payment was already processed, mark as paid
+    if (paymentMethod === 'Stripe' && paymentDetails && paymentDetails.id) {
+      isPaid = true;
+      paidAt = Date.now();
+      paymentResult = {
+        id: paymentDetails.id,
+        status: 'succeeded',
+        update_time: new Date().toISOString(),
+        email_address: req.user.email
+      };
+    }
     
     // Create order
     const order = await Order.create({
@@ -27,9 +45,13 @@ exports.createOrder = async (req, res) => {
       orderItems,
       shippingAddress,
       paymentMethod,
+      paymentResult,
       taxPrice,
       shippingPrice,
-      totalPrice
+      totalPrice,
+      isPaid,
+      paidAt,
+      isDelivered: false
     });
     
     res.status(201).json({

@@ -1,8 +1,8 @@
 // src/pages/LoginPage.js
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { loginUser, clearError } from '../redux/slices/authSlice';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { loginUser, clearError, initiateOAuthLogin } from '../redux/slices/authSlice';
 import './LoginPage.css';
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
@@ -15,6 +15,7 @@ const LoginPage = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { loading, error, userInfo } = useSelector((state) => state.auth);
   
@@ -22,12 +23,26 @@ const LoginPage = () => {
     if (userInfo) {
       navigate('/');
     }
+    
+    // Check if there's an error from OAuth redirect
+    const params = new URLSearchParams(location.search);
+    const errorMsg = params.get('error');
+    
+    if (errorMsg) {
+      console.error('OAuth Error:', errorMsg);
+      // You could dispatch an action here to show the error
+    }
+    
     dispatch(clearError());
-  }, [userInfo, navigate, dispatch]);
+  }, [userInfo, navigate, dispatch, location]);
   
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email, password }));
+  };
+  
+  const handleSocialLogin = (provider) => {
+    window.location.href = `/api/auth/${provider}`;
   };
   
   return (
@@ -134,14 +149,17 @@ const LoginPage = () => {
             </button>
           </form>
           
-          <div className="divider">Or continue with ✨</div>
+          <div className="divider"><span>Or continue with ✨</span></div>
           
           <div className="social-buttons">
-            <button className="social-button">
+            <button 
+              className="social-button google-button"
+              onClick={() => handleSocialLogin('google')}
+              type="button"
+              disabled={loading}
+            >
+              <span className="social-icon">🔍</span>
               Google 🎀
-            </button>
-            <button className="social-button">
-              Facebook ❤️
             </button>
           </div>
           

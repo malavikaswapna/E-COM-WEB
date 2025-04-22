@@ -26,7 +26,7 @@ const PlaceOrderPage = () => {
       navigate(`/order/${order._id}`);
       dispatch(resetOrder());
       dispatch(clearCart());
-      toast.success('Order placed successfully!');
+      toast.success('Order placed successfully! Please complete payment in the next step.');
     }
   }, [success, navigate, order, dispatch]);
 
@@ -45,6 +45,7 @@ const PlaceOrderPage = () => {
         orderItems: cart.cartItems,
         shippingAddress: cart.shippingAddress,
         paymentMethod: cart.paymentMethod,
+        paymentDetails: cart.paymentDetails,
         itemsPrice: cart.itemsPrice || 0,
         shippingPrice: cart.shippingPrice || 0,
         taxPrice: cart.taxPrice || 0,
@@ -93,10 +94,16 @@ const PlaceOrderPage = () => {
             
             <div className="bento-card payment-info-card">
               <div className="card-header">
-                <h2>Payment</h2>
+              <h2>Payment</h2>
               </div>
               <div className="card-content">
                 <p><strong>Method:</strong> {cart.paymentMethod}</p>
+                <p className="payment-status">
+                  {cart.paymentDetails?.id ? 
+                    <span className="payment-verified">✓ Payment information verified</span> : 
+                    <span>Payment will be completed after order placement</span>
+                  }
+                </p>
                 <Link to="/payment" className="edit-link">Edit</Link>
               </div>
             </div>

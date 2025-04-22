@@ -1,6 +1,58 @@
 // backend/controllers/authController.js
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+// At the top of authController.js
+console.log('Loading Auth Controller');
+console.log('Google Client ID available:', !!process.env.GOOGLE_CLIENT_ID);
+console.log('Google Client Secret available:', !!process.env.GOOGLE_CLIENT_SECRET);
+
+// Configure Passport
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/api/auth/google/callback",
+    scope: ['profile', 'email']
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      // Check if user already exists
+      let user = await User.findOne({ email: profile.emails[0].value });
+      
+      if (user) {
+        return done(null, user);
+      }
+      
+      // Create new user
+      user = await User.create({
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8),
+        // This creates a random password - user can reset it later if needed
+      });
+      
+      return done(null, user);
+    } catch (error) {
+      return done(error, null);
+    }
+  }
+));
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
 
 // Generate JWT token
 const signToken = (id) => {
@@ -162,4 +214,18 @@ exports.refreshToken = async (req, res) => {
       message: 'Error refreshing token'
     });
   }
+};
+
+// Google OAuth handlers
+exports.googleAuth = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+exports.googleCallback = (req, res, next) => {
+  passport.authenticate('google', { session: false }, (err, user) => {
+    if (err || !user) {
+      return res.redirect('/login?error=Google authentication failed');
+    }
+    
+    const token = signToken(user._id);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3001'}/oauth-success?token=${token}`);
+  })(req, res, next);
 };

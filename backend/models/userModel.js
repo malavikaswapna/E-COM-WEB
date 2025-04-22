@@ -23,8 +23,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'subscriber'],
     default: 'user'
+  },
+  newsletterSubscribed: {
+    type: Boolean,
+    default: false
   },
   flavorPreferences: {
     likedFlavors: [String],

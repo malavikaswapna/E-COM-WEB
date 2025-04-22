@@ -1,9 +1,11 @@
 // frontend/src/App.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NotFound from './pages/NotFound';
+import { useDispatch } from 'react-redux';
+import { getUserProfile } from './redux/slices/authSlice';
 
 import BentoHeader from './components/layout/BentoHeader';
 import BentoFooter from './components/layout/BentoFooter';
@@ -21,6 +23,7 @@ import PlaceOrderPage from './pages/PlaceOrderPage';
 import OrderPage from './pages/OrderPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import ProfilePage from './pages/ProfilePage';
+import OAuthSuccessPage from './pages/OAuthSuccessPage';
 
 // Subscription Pages
 import MySubscriptionsPage from './pages/subscription/MySubscriptionsPage';
@@ -37,6 +40,16 @@ import ProductCreatePage from './pages/admin/ProductCreatePage'; // We'll create
 import './App.css';
 
 function App() {
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    // Check if user is logged in (has token)
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
       <BentoHeader />
@@ -48,6 +61,7 @@ function App() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/oauth-success" element={<OAuthSuccessPage />} />
 
           {/* Protected User Routes */}
           <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />

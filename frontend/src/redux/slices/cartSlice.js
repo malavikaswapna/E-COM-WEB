@@ -18,7 +18,12 @@ const initialState = {
 
 const cartSlice = createSlice({
   name: 'cart',
-  initialState,
+  initialState: {
+    cartItems: [],
+    shippingAddress: {},
+    paymentMethod: '',
+    userAddresses: {},
+  },
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload;
@@ -60,11 +65,31 @@ const cartSlice = createSlice({
 
     saveShippingAddress: (state, action) => {
       state.shippingAddress = action.payload;
-      localStorage.setItem('shippingAddress', JSON.stringify(action.payload));
+      // If we have a user ID in the payload, store this address for that user
+      if (action.payload.userId) {
+        state.userAddresses[action.payload.userId] = action.payload;
+      }
     },
+
+    // Add a new reducer to load a user's saved address
+    loadUserAddress: (state, action) => {
+      const userId = action.payload;
+      if (userId && state.userAddresses[userId]) {
+        state.shippingAddress = state.userAddresses[userId];
+      } else {
+        // Reset to empty if no saved address for this user
+        state.shippingAddress = {};
+      }
+    },
+
+    // Add a reset shipping info method to use on logout
+    resetShippingInfo: (state) => {
+      state.shippingAddress = {};
+    },
+
     savePaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload;
-      localStorage.setItem('paymentMethod', action.payload);
+      state.paymentMethod = action.payload.type;
+      state.paymentDetails = action.payload;
     },
     clearCart: (state) => {
       state.cartItems = [];
@@ -108,6 +133,8 @@ export const {
   addToCart,
   removeFromCart,
   saveShippingAddress,
+  loadUserAddress, 
+  resetShippingInfo,
   savePaymentMethod,
   clearCart,
   updateCartItemQuantity,

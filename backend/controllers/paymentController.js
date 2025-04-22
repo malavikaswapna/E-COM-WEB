@@ -2,6 +2,47 @@
 const stripe = require('../config/stripe');
 const Order = require('../models/orderModel');
 
+// New endpoint to create a payment intent before order creation
+exports.createIntent = async (req, res) => {
+  console.log('createIntent endpoint hit', req.body);
+  try {
+    const { amount } = req.body;
+    
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Valid amount is required'
+      });
+    }
+    
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe requires amount in cents
+      currency: 'usd',
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        userId: req.user._id.toString()
+      },
+      // Make sure it captures payment immediately, not just authorizes it
+      capture_method: 'automatic'
+    });
+    
+    res.status(200).json({
+      status: 'success',
+      clientSecret: paymentIntent.client_secret
+    });
+  } catch (error) {
+    console.error('Payment intent error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Could not create payment intent',
+      details: error.message
+    });
+  }
+};
+
 exports.createPaymentIntent = async (req, res) => {
   try {
     const { orderId } = req.body;

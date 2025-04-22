@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 import './HomePage.css';
 
 
 const HomePage = () => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      await axios.post('/api/marketing/subscribe', { email });
+      
+      toast.success('✨ You\'ve been subscribed to our magical updates! ✨');
+      setEmail('');
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error('Oops! Something went wrong with your subscription');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="home-container">
       {/* Hero Section */}
@@ -235,14 +261,21 @@ const HomePage = () => {
           <h2>Join Our Flavor Journey ✨</h2>
           <p>Sign up for our newsletter to receive exclusive offers, flavor inspirations, and updates on new arrivals</p>
           
-          <form className="newsletter-form">
+          <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
             <input 
               type="email" 
               placeholder="Your email address" 
               className="newsletter-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            <button type="submit" className="newsletter-button">
-              Subscribe
+            <button
+             type="submit" 
+             className="newsletter-button"
+             disabled={loading}
+           >
+             {loading ? "Signing Up..." : "Subscribe"}
             </button>
           </form>
         </div>

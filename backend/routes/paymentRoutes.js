@@ -6,6 +6,7 @@ const authController = require('../controllers/authController');
 
 router.use(authController.protect);
 
+router.post('/create-intent', paymentController.createIntent);
 router.post('/create-payment-intent', paymentController.createPaymentIntent);
 router.post('/update-payment-status', paymentController.updatePaymentStatus);
 
