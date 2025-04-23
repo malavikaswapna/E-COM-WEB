@@ -23,7 +23,18 @@ const ProductCreatePage = () => {
     origin: {
       country: '',
       region: '',
+      farm: '',
+      coordinates: {
+        latitude: '',
+        longitude: ''
+      },
+      altitude: '',
       cultivationMethod: 'conventional'
+    },
+    producerInfo: {
+      story: '',
+      images: [''],
+      sustainablePractices: []
     },
     flavorProfile: {
       primary: [''],
@@ -31,6 +42,14 @@ const ProductCreatePage = () => {
       intensity: 3,
       characteristics: []
     },
+    batchInfo: {
+      batchNumber: '',
+      productionDate: '',
+      bestBefore: '',
+      shelfLifeDays: 365
+    },
+    usageRecommendations: [''],
+    storageInstructions: '',
     categories: [''],
     isActive: true,
     featured: false
@@ -39,23 +58,49 @@ const ProductCreatePage = () => {
   const flavorOptions = [
     'Sweet', 'Spicy', 'Bitter', 'Sour', 'Umami',
     'Floral', 'Earthy', 'Fruity', 'Smoky', 'Herbal',
-    'Nutty', 'Pungent', 'Citrusy', 'Woody', 'Fresh'
+    'Nutty', 'Pungent', 'Citrusy', 'Woody', 'Fresh',
+    'Warm', 'Aromatic', 'Cool', 'Refreshing'
+  ];
+
+  const sustainablePracticeOptions = [
+    'Organic', 'Fair Trade', 'Rainforest Alliance', 'Shade-Grown', 
+    'Bird Friendly', 'Direct Trade', 'Small Batch', 'Recyclable Packaging', 
+    'Carbon Neutral', 'Sustainable Farming'
   ];
   
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Handle nested properties
+    // Handle deeply nested properties
     if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setProductData({
-        ...productData,
-        [parent]: {
-          ...productData[parent],
-          [child]: value
-        }
-      });
+      const parts = name.split('.');
+      
+      if (parts.length === 2) {
+        // Handle single-level nesting (e.g., 'origin.country')
+        const [parent, child] = parts;
+        setProductData({
+          ...productData,
+          [parent]: {
+            ...productData[parent],
+            [child]: value
+          }
+        });
+      } else if (parts.length === 3) {
+        // Handle two-level nesting (e.g., 'origin.coordinates.latitude')
+        const [grandparent, parent, child] = parts;
+        setProductData({
+          ...productData,
+          [grandparent]: {
+            ...productData[grandparent],
+            [parent]: {
+              ...productData[grandparent][parent],
+              [child]: value
+            }
+          }
+        });
+      }
     } else {
+      // Handle top-level properties
       setProductData({
         ...productData,
         [name]: value
@@ -134,6 +179,44 @@ const ProductCreatePage = () => {
     }
   };
   
+  const handleCheckboxArrayChange = (e, field) => {
+    const { value, checked } = e.target;
+    
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      
+      if (checked) {
+        setProductData({
+          ...productData,
+          [parent]: {
+            ...productData[parent],
+            [child]: [...productData[parent][child], value]
+          }
+        });
+      } else {
+        setProductData({
+          ...productData,
+          [parent]: {
+            ...productData[parent],
+            [child]: productData[parent][child].filter(item => item !== value)
+          }
+        });
+      }
+    } else {
+      if (checked) {
+        setProductData({
+          ...productData,
+          [field]: [...productData[field], value]
+        });
+      } else {
+        setProductData({
+          ...productData,
+          [field]: productData[field].filter(item => item !== value)
+        });
+      }
+    }
+  };
+  
   const handleCharacteristicsChange = (e) => {
     const { value, checked } = e.target;
     
@@ -180,9 +263,23 @@ const ProductCreatePage = () => {
         ...productData,
         price: parseFloat(productData.price),
         stock: parseInt(productData.stock),
+        origin: {
+          ...productData.origin,
+          coordinates: {
+            latitude: parseFloat(productData.origin.coordinates.latitude) || 0,
+            longitude: parseFloat(productData.origin.coordinates.longitude) || 0
+          }
+        },
         flavorProfile: {
           ...productData.flavorProfile,
           intensity: parseInt(productData.flavorProfile.intensity)
+        },
+        batchInfo: {
+          ...productData.batchInfo,
+          shelfLifeDays: parseInt(productData.batchInfo.shelfLifeDays) || 365,
+          // Convert string dates to Date objects if they exist
+          productionDate: productData.batchInfo.productionDate ? new Date(productData.batchInfo.productionDate) : null,
+          bestBefore: productData.batchInfo.bestBefore ? new Date(productData.batchInfo.bestBefore) : null
         }
       };
       
@@ -191,6 +288,9 @@ const ProductCreatePage = () => {
       dataToSubmit.categories = dataToSubmit.categories.filter(cat => cat.trim() !== '');
       dataToSubmit.flavorProfile.primary = dataToSubmit.flavorProfile.primary.filter(p => p.trim() !== '');
       dataToSubmit.flavorProfile.notes = dataToSubmit.flavorProfile.notes.filter(n => n.trim() !== '');
+      dataToSubmit.usageRecommendations = dataToSubmit.usageRecommendations.filter(r => r.trim() !== '');
+      dataToSubmit.producerInfo.images = dataToSubmit.producerInfo.images.filter(img => img.trim() !== '');
+      dataToSubmit.producerInfo.sustainablePractices = dataToSubmit.producerInfo.sustainablePractices.filter(p => p.trim() !== '');
       
       const { data } = await axios.post('/api/products', dataToSubmit, config);
       
@@ -399,6 +499,52 @@ const ProductCreatePage = () => {
               </div>
               
               <div className="form-group">
+                <label>Farm Name</label>
+                <input
+                  type="text"
+                  name="origin.farm"
+                  value={productData.origin.farm}
+                  onChange={handleChange}
+                  placeholder="Name of the farm or estate"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Altitude</label>
+                <input
+                  type="text"
+                  name="origin.altitude"
+                  value={productData.origin.altitude}
+                  onChange={handleChange}
+                  placeholder="e.g., 1,200-1,500m"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Latitude</label>
+                <input
+                  type="number"
+                  name="origin.coordinates.latitude"
+                  value={productData.origin.coordinates.latitude}
+                  onChange={handleChange}
+                  step="0.00001"
+                  placeholder="e.g., 9.76145"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Longitude</label>
+                <input
+                  type="number"
+                  name="origin.coordinates.longitude"
+                  value={productData.origin.coordinates.longitude}
+                  onChange={handleChange}
+                  step="0.00001"
+                  placeholder="e.g., 77.13805"
+                />
+              </div>
+              
+              <div className="form-group">
                 <label>Cultivation Method</label>
                 <select
                   name="origin.cultivationMethod"
@@ -410,6 +556,76 @@ const ProductCreatePage = () => {
                   <option value="wild-harvested">Wild Harvested</option>
                   <option value="biodynamic">Biodynamic</option>
                 </select>
+              </div>
+            </div>
+          </div>
+          
+          {/* Producer Information */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Producer Information</h2>
+              <p>Tell the story behind the product</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group full-width">
+                <label>Producer Story</label>
+                <textarea
+                  name="producerInfo.story"
+                  value={productData.producerInfo.story}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="Share the story of the producers and their traditions"
+                ></textarea>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Producer Images</label>
+                <div className="array-items">
+                  {productData.producerInfo.images.map((image, index) => (
+                    <div key={index} className="array-item">
+                      <input
+                        type="text"
+                        value={image}
+                        onChange={(e) => handleArrayChange(e, index, 'producerInfo.images')}
+                        placeholder="Producer image URL"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem(index, 'producerInfo.images')}
+                        className="remove-button"
+                        disabled={productData.producerInfo.images.length <= 1}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('producerInfo.images')}
+                    className="add-button"
+                  >
+                    + Add Producer Image
+                  </button>
+                </div>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Sustainable Practices</label>
+                <div className="flavor-characteristics">
+                  {sustainablePracticeOptions.map(practice => (
+                    <label key={practice} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value={practice}
+                        checked={productData.producerInfo.sustainablePractices.includes(practice)}
+                        onChange={(e) => handleCheckboxArrayChange(e, 'producerInfo.sustainablePractices')}
+                      />
+                      <span>{practice}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -519,6 +735,128 @@ const ProductCreatePage = () => {
               </div>
             </div>
           </div>
+          
+          {/* Batch Information */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Batch Information</h2>
+              <p>Details about this specific product batch</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Batch Number</label>
+                <input
+                  type="text"
+                  name="batchInfo.batchNumber"
+                  value={productData.batchInfo.batchNumber}
+                  onChange={handleChange}
+                  placeholder="e.g., CIN-2023-001"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Shelf Life (Days)</label>
+                <input
+                  type="number"
+                  name="batchInfo.shelfLifeDays"
+                  value={productData.batchInfo.shelfLifeDays}
+                  onChange={handleChange}
+                  min="1"
+                  placeholder="e.g., 365"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Production Date</label>
+                <input
+                  type="date"
+                  name="batchInfo.productionDate"
+                  value={productData.batchInfo.productionDate}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Best Before Date</label>
+                <input
+                  type="date"
+                  name="batchInfo.bestBefore"
+                  value={productData.batchInfo.bestBefore}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Usage & Storage */}
+          <div className="form-section">
+            <div className="section-header">
+              <h2>Usage & Storage</h2>
+              <p>Help customers get the most from your product</p>
+            </div>
+            
+            <div className="form-grid">
+              <div className="form-group full-width">
+                <label>Usage Recommendations</label>
+                <div className="array-items">
+                  {productData.usageRecommendations.map((recommendation, index) => (
+                    <div key={index} className="array-item">
+                      <input
+                        type="text"
+                        value={recommendation}
+                        onChange={(e) => handleArrayChange(e, index, 'usageRecommendations')}
+                        placeholder="How to use this product"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeArrayItem(index, 'usageRecommendations')}
+                        className="remove-button small"
+                        disabled={productData.usageRecommendations.length <= 1}
+                      >
+                        -
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <button
+                    type="button"
+                    onClick={() => addArrayItem('usageRecommendations')}
+                    className="add-button"
+                  >
+                    + Add Recommendation
+                  </button>
+                </div>
+              </div>
+              
+              <div className="form-group full-width">
+                <label>Storage Instructions</label>
+                <textarea
+                  name="storageInstructions"
+                  value={productData.storageInstructions}
+                  onChange={handleChange}
+                  rows="2"
+                  placeholder="How to store this product for maximum freshness"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          
+          {/* Blend Components - Only show for blend type */}
+          {productData.type === 'blend' && (
+            <div className="form-section">
+              <div className="section-header">
+                <h2>Blend Components</h2>
+                <p>List the ingredients that make up this blend</p>
+              </div>
+              
+              <div className="form-grid">
+                <div className="form-group full-width">
+                  <p className="info-note">For blend components, please add details in the description field for now.</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Categories */}
           <div className="form-section">

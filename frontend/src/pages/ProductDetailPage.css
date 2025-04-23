@@ -33,14 +33,17 @@
 /* Grid Layout */
 .product-detail-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 2fr;
+  grid-auto-rows: auto;
   gap: 1.5rem;
 }
 
 .product-image-card {
   grid-column: span 1;
   grid-row: span 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-info-card {
@@ -81,18 +84,20 @@
 /* Product Image Card */
 .product-image-container {
   position: relative;
-  padding: 1.5rem;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .product-main-image {
-  width: 100%;
+  max-width: 100%;
+  width: auto;
   height: auto;
   max-height: 400px;
-  max-width: 100%;
-  object-fit: cover;
   border-radius: 12px;
+  object-fit: contain;
 }
 
 .product-type-badge {
@@ -203,6 +208,8 @@
   margin-bottom: 1.5rem;
   color: #40373A;
   line-height: 1.6;
+  overflow: visible;
+  word-wrap: break-word;
 }
 
 /* Add to Cart Section */
@@ -954,8 +961,6 @@
       max-height: 250px;
     }
   }
-
-  /* Add to your ProductDetailPage.css file */
 
 /* Blend-specific styles */
 .blend-info {

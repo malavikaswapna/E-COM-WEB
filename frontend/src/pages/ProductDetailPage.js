@@ -190,7 +190,8 @@ const ProductDetailPage = () => {
         <div className="product-detail-grid">
           {/* Product Image Card */}
           <div className="bento-card product-image-card">
-            <div className="product-image-container">
+            <div className="product-image-wrapper">
+              <div className="product-image-container">
               <img
                 src={product.images && product.images.length > 0 ? product.images[0] : '/images/placeholder-spice.jpg'}
                 alt={product.name}
@@ -217,6 +218,7 @@ const ProductDetailPage = () => {
                 </div>
               )}
             </div>
+          </div>
             
             {/* Thumbnail images would go here */}
             {product.images && product.images.length > 1 && (
