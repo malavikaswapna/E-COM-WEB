@@ -1,4 +1,3 @@
-
 // backend/routes/subscriptionRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -8,18 +7,7 @@ const authController = require('../controllers/authController');
 // Protect all subscription routes
 router.use(authController.protect);
 
-// User subscription routes
-router.route('/')
-  .get(subscriptionController.getUserSubscriptions)
-  .post(subscriptionController.createSubscription);
-
 router.get('/recommendations', subscriptionController.getRecommendedProducts);
-
-router.route('/:id')
-  .get(subscriptionController.getSubscriptionById)
-  .put(subscriptionController.updateSubscription);
-
-router.post('/:id/cancel', subscriptionController.cancelSubscription);
 
 // Admin routes
 router.post(
@@ -27,5 +15,16 @@ router.post(
   authController.restrictTo('admin'),
   subscriptionController.processSubscriptions
 );
+
+// User subscription routes
+router.route('/')
+  .get(subscriptionController.getUserSubscriptions)
+  .post(subscriptionController.createSubscription);
+
+router.route('/:id')
+  .get(subscriptionController.getSubscriptionById)
+  .put(subscriptionController.updateSubscription);
+
+router.post('/:id/cancel', subscriptionController.cancelSubscription);
 
 module.exports = router;
